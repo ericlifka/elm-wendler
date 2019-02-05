@@ -1,10 +1,10 @@
-# elm-todo
+# elm-wendler
 
 
 
 ## Overview
 
-todo app in elm to learn from
+wendler 531 program tracker in elm
 
 
 ## Getting Started

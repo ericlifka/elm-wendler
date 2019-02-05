@@ -1,7 +1,7 @@
 {
-  "name": "elm-todo",
+  "name": "elm-wendler",
   "version": "1.0.0",
-  "description": "todo app in elm to learn from",
+  "description": "wendler 531 program tracker in elm",
   "scripts": {
     "start": "parcel app/index.html",
     "build": "parcel build app/index.html",
@@ -13,6 +13,7 @@
   "dependencies": {},
   "devDependencies": {
     "elm": "^0.19.0-bugfix2",
+    "elm-hot": "^1.0.1",
     "elm-test": "^0.19.0-beta9",
     "node-elm-compiler": "^5.0.1",
     "parcel-bundler": "^1.10.1"

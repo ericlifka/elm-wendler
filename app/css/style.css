@@ -1,12 +1,17 @@
-#counter-app {
-  font-family: "sans-serif";
-  text-align: center;
+.lift-maxes .row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
 }
 
-.counter {
-  font-size: 3rem;
+.lift-maxes .row > * {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
-.controls button {
-  margin: 5px;
+.lift-maxes .value {
+  font-weight: bold;
+  font-size: 28px;
 }

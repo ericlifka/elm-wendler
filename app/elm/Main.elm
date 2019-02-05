@@ -25,13 +25,13 @@ main =
 
 
 type alias Model =
-    { count : Int
+    { bench : Int
     }
 
 
 initalModel : Model
 initalModel =
-    { count = 0
+    { bench = 0
     }
 
 
@@ -40,18 +40,18 @@ initalModel =
 
 
 type Msg
-    = AddOne
-    | SubtractOne
+    = AddFiveToBench
+    | SubtractFiveFromBench
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AddOne ->
-            { model | count = model.count + 1 }
+        AddFiveToBench ->
+            { model | bench = model.bench + 5 }
 
-        SubtractOne ->
-            { model | count = model.count - 1 }
+        SubtractFiveFromBench ->
+            { model | bench = model.bench - 5 }
 
 
 
@@ -60,11 +60,13 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ id "counter-app" ]
-        [ div [ class "counter" ]
-            [ text (String.fromInt model.count) ]
-        , div [ class "controls" ]
-            [ button [ onClick AddOne ] [ text "+1" ]
-            , button [ onClick SubtractOne ] [ text "-1" ]
+    div [ class "lift-maxes" ]
+        [ div [ class "row bench" ]
+            [ div [ class "label" ]
+                [ text "Bench" ]
+            , div [ class "value" ]
+                [ text (String.fromInt model.bench) ]
+            , button [ onClick AddFiveToBench ] [ text "+5" ]
+            , button [ onClick SubtractFiveFromBench ] [ text "-5" ]
             ]
         ]

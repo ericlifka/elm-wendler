@@ -27,6 +27,8 @@ main =
 type alias Model =
     { bench : Int
     , squat : Int
+    , deadlift : Int
+    , press : Int
     }
 
 
@@ -34,6 +36,8 @@ initalModel : Model
 initalModel =
     { bench = 0
     , squat = 0
+    , deadlift = 0
+    , press = 0
     }
 
 
@@ -46,6 +50,10 @@ type Msg
     | SubtractFiveFromBench
     | AddFiveToSquat
     | SubtractFiveFromSquat
+    | AddFiveToDeadlift
+    | SubtractFiveFromDeadlift
+    | AddFiveToPress
+    | SubtractFiveFromPress
 
 
 update : Msg -> Model -> Model
@@ -62,6 +70,18 @@ update msg model =
 
         SubtractFiveFromSquat ->
             { model | squat = model.squat - 5 }
+
+        AddFiveToDeadlift ->
+            { model | deadlift = model.deadlift + 5 }
+
+        SubtractFiveFromDeadlift ->
+            { model | deadlift = model.deadlift - 5 }
+
+        AddFiveToPress ->
+            { model | press = model.press + 5 }
+
+        SubtractFiveFromPress ->
+            { model | press = model.press - 5 }
 
 
 
@@ -86,5 +106,21 @@ view model =
                 [ text (String.fromInt model.squat) ]
             , button [ onClick AddFiveToSquat ] [ text "+5" ]
             , button [ onClick SubtractFiveFromSquat ] [ text "-5" ]
+            ]
+        , div [ class "row deadlift" ]
+            [ div [ class "label" ]
+                [ text "Deadlift" ]
+            , div [ class "value" ]
+                [ text (String.fromInt model.deadlift) ]
+            , button [ onClick AddFiveToDeadlift ] [ text "+5" ]
+            , button [ onClick SubtractFiveFromDeadlift ] [ text "-5" ]
+            ]
+        , div [ class "row press" ]
+            [ div [ class "label" ]
+                [ text "Press" ]
+            , div [ class "value" ]
+                [ text (String.fromInt model.press) ]
+            , button [ onClick AddFiveToPress ] [ text "+5" ]
+            , button [ onClick SubtractFiveFromPress ] [ text "-5" ]
             ]
         ]

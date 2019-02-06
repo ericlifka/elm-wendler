@@ -16,3 +16,30 @@
   font-weight: bold;
   font-size: 28px;
 }
+
+
+
+.lift-groups {
+  display: flex;
+  flex-direction: column;
+  padding: 0 15px;
+}
+
+.lift-groups .group {
+  padding-left: 20px;
+  display: flex; 
+  flex-direction: column;
+  background-color: aliceblue;
+  margin-bottom: 15px;
+}
+
+.lift-groups .header {
+  margin-left: -20px;
+  margin-top: 5px;
+}
+
+.lift-groups .week {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+}

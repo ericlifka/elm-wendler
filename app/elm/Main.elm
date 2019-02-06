@@ -26,12 +26,14 @@ main =
 
 type alias Model =
     { bench : Int
+    , squat : Int
     }
 
 
 initalModel : Model
 initalModel =
     { bench = 0
+    , squat = 0
     }
 
 
@@ -42,6 +44,8 @@ initalModel =
 type Msg
     = AddFiveToBench
     | SubtractFiveFromBench
+    | AddFiveToSquat
+    | SubtractFiveFromSquat
 
 
 update : Msg -> Model -> Model
@@ -52,6 +56,12 @@ update msg model =
 
         SubtractFiveFromBench ->
             { model | bench = model.bench - 5 }
+
+        AddFiveToSquat ->
+            { model | squat = model.squat + 5 }
+
+        SubtractFiveFromSquat ->
+            { model | squat = model.squat - 5 }
 
 
 
@@ -68,5 +78,13 @@ view model =
                 [ text (String.fromInt model.bench) ]
             , button [ onClick AddFiveToBench ] [ text "+5" ]
             , button [ onClick SubtractFiveFromBench ] [ text "-5" ]
+            ]
+        , div [ class "row squat" ]
+            [ div [ class "label" ]
+                [ text "Squat" ]
+            , div [ class "value" ]
+                [ text (String.fromInt model.squat) ]
+            , button [ onClick AddFiveToSquat ] [ text "+5" ]
+            , button [ onClick SubtractFiveFromSquat ] [ text "-5" ]
             ]
         ]

@@ -91,36 +91,20 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ class "lift-maxes" ]
-        [ div [ class "row bench" ]
-            [ div [ class "label" ]
-                [ text "Bench" ]
-            , div [ class "value" ]
-                [ text (String.fromInt model.bench) ]
-            , button [ onClick AddFiveToBench ] [ text "+5" ]
-            , button [ onClick SubtractFiveFromBench ] [ text "-5" ]
-            ]
-        , div [ class "row squat" ]
-            [ div [ class "label" ]
-                [ text "Squat" ]
-            , div [ class "value" ]
-                [ text (String.fromInt model.squat) ]
-            , button [ onClick AddFiveToSquat ] [ text "+5" ]
-            , button [ onClick SubtractFiveFromSquat ] [ text "-5" ]
-            ]
-        , div [ class "row deadlift" ]
-            [ div [ class "label" ]
-                [ text "Deadlift" ]
-            , div [ class "value" ]
-                [ text (String.fromInt model.deadlift) ]
-            , button [ onClick AddFiveToDeadlift ] [ text "+5" ]
-            , button [ onClick SubtractFiveFromDeadlift ] [ text "-5" ]
-            ]
-        , div [ class "row press" ]
-            [ div [ class "label" ]
-                [ text "Press" ]
-            , div [ class "value" ]
-                [ text (String.fromInt model.press) ]
-            , button [ onClick AddFiveToPress ] [ text "+5" ]
-            , button [ onClick SubtractFiveFromPress ] [ text "-5" ]
-            ]
+        [ liftMaxRow "bench" model.bench AddFiveToBench SubtractFiveFromBench
+        , liftMaxRow "squat" model.squat AddFiveToSquat SubtractFiveFromSquat
+        , liftMaxRow "deadlift" model.deadlift AddFiveToDeadlift SubtractFiveFromDeadlift
+        , liftMaxRow "press" model.press AddFiveToPress SubtractFiveFromPress
+        ]
+
+
+liftMaxRow : String -> Int -> Msg -> Msg -> Html Msg
+liftMaxRow name value addFive subtractFive =
+    div [ class ("row " ++ name) ]
+        [ div [ class "label" ]
+            [ text name ]
+        , div [ class "value" ]
+            [ text (String.fromInt value) ]
+        , button [ onClick addFive ] [ text "+5" ]
+        , button [ onClick subtractFive ] [ text "-5" ]
         ]

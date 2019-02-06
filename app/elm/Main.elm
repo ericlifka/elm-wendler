@@ -46,42 +46,26 @@ initalModel =
 
 
 type Msg
-    = AddFiveToBench
-    | SubtractFiveFromBench
-    | AddFiveToSquat
-    | SubtractFiveFromSquat
-    | AddFiveToDeadlift
-    | SubtractFiveFromDeadlift
-    | AddFiveToPress
-    | SubtractFiveFromPress
+    = AddBench Int
+    | AddSquat Int
+    | AddDeadlift Int
+    | AddPress Int
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AddFiveToBench ->
-            { model | bench = model.bench + 5 }
+        AddBench value ->
+            { model | bench = model.bench + value }
 
-        SubtractFiveFromBench ->
-            { model | bench = model.bench - 5 }
+        AddSquat value ->
+            { model | squat = model.squat + value }
 
-        AddFiveToSquat ->
-            { model | squat = model.squat + 5 }
+        AddDeadlift value ->
+            { model | deadlift = model.deadlift + value }
 
-        SubtractFiveFromSquat ->
-            { model | squat = model.squat - 5 }
-
-        AddFiveToDeadlift ->
-            { model | deadlift = model.deadlift + 5 }
-
-        SubtractFiveFromDeadlift ->
-            { model | deadlift = model.deadlift - 5 }
-
-        AddFiveToPress ->
-            { model | press = model.press + 5 }
-
-        SubtractFiveFromPress ->
-            { model | press = model.press - 5 }
+        AddPress value ->
+            { model | press = model.press + value }
 
 
 
@@ -91,20 +75,20 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ class "lift-maxes" ]
-        [ liftMaxRow "bench" model.bench AddFiveToBench SubtractFiveFromBench
-        , liftMaxRow "squat" model.squat AddFiveToSquat SubtractFiveFromSquat
-        , liftMaxRow "deadlift" model.deadlift AddFiveToDeadlift SubtractFiveFromDeadlift
-        , liftMaxRow "press" model.press AddFiveToPress SubtractFiveFromPress
+        [ liftMaxRow "bench" model.bench AddBench
+        , liftMaxRow "squat" model.squat AddSquat
+        , liftMaxRow "deadlift" model.deadlift AddDeadlift
+        , liftMaxRow "press" model.press AddPress
         ]
 
 
-liftMaxRow : String -> Int -> Msg -> Msg -> Html Msg
-liftMaxRow name value addFive subtractFive =
+liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
+liftMaxRow name value addLift =
     div [ class ("row " ++ name) ]
         [ div [ class "label" ]
             [ text name ]
         , div [ class "value" ]
             [ text (String.fromInt value) ]
-        , button [ onClick addFive ] [ text "+5" ]
-        , button [ onClick subtractFive ] [ text "-5" ]
+        , button [ onClick (addLift 5) ] [ text "+5" ]
+        , button [ onClick (addLift -5) ] [ text "-5" ]
         ]

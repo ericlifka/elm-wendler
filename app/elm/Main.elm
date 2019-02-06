@@ -74,21 +74,60 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "lift-maxes" ]
-        [ liftMaxRow "bench" model.bench AddBench
-        , liftMaxRow "squat" model.squat AddSquat
-        , liftMaxRow "deadlift" model.deadlift AddDeadlift
-        , liftMaxRow "press" model.press AddPress
+    div []
+        [ div [ class "lift-maxes" ]
+            [ liftMaxRow "Bench" model.bench AddBench
+            , liftMaxRow "Squat" model.squat AddSquat
+            , liftMaxRow "Deadlift" model.deadlift AddDeadlift
+            , liftMaxRow "Press" model.press AddPress
+            ]
+        , div [ class "lift-groups" ]
+            [ liftGroup "Bench" model.bench
+            , liftGroup "Squat" model.squat
+            , liftGroup "Deadlift" model.deadlift
+            , liftGroup "Press" model.press
+            ]
         ]
 
 
 liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
-liftMaxRow name value addLift =
-    div [ class ("row " ++ name) ]
+liftMaxRow lift value addLift =
+    div [ class ("row " ++ lift) ]
         [ div [ class "label" ]
-            [ text name ]
+            [ text lift ]
         , div [ class "value" ]
             [ text (String.fromInt value) ]
         , button [ onClick (addLift 5) ] [ text "+5" ]
         , button [ onClick (addLift -5) ] [ text "-5" ]
+        ]
+
+
+liftGroup : String -> Int -> Html Msg
+liftGroup lift value =
+    div [ class ("group " ++ lift) ]
+        [ div [ class "group-header" ] [ text lift ]
+        , div [ class "week deload" ]
+            [ div [ class "row header" ] [ text "warmup / deload" ]
+            , div [ class "row" ] [ text "40% x5" ]
+            , div [ class "row" ] [ text "50% x5" ]
+            , div [ class "row" ] [ text "60% x5" ]
+            ]
+        , div [ class "week 555" ]
+            [ div [ class "row header" ] [ text "555" ]
+            , div [ class "row" ] [ text "65% x5" ]
+            , div [ class "row" ] [ text "75% x5" ]
+            , div [ class "row" ] [ text "85% x5+" ]
+            ]
+        , div [ class "week 333" ]
+            [ div [ class "row header" ] [ text "333" ]
+            , div [ class "row" ] [ text "70% x3" ]
+            , div [ class "row" ] [ text "80% x3" ]
+            , div [ class "row" ] [ text "90% x3+" ]
+            ]
+        , div [ class "week 531" ]
+            [ div [ class "row header" ] [ text "531" ]
+            , div [ class "row" ] [ text "75% x5" ]
+            , div [ class "row" ] [ text "85% x3" ]
+            , div [ class "row" ] [ text "95% x1+" ]
+            ]
         ]

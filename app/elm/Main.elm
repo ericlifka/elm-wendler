@@ -162,17 +162,16 @@ roundToFive weight =
 
 calcPlates : Float -> List Float -> List Float
 calcPlates remaining plates =
-    if remaining < 0 then
-        []
+    case plates of
+        [] ->
+            []
 
-    else
-        case plates of
-            [] ->
+        largest :: rest ->
+            if remaining <= 0 then
                 []
 
-            largest :: rest ->
-                if (2 * largest) > remaining then
-                    calcPlates remaining rest
+            else if (2 * largest) > remaining then
+                calcPlates remaining rest
 
-                else
-                    largest :: calcPlates (remaining - (2 * largest)) plates
+            else
+                largest :: calcPlates (remaining - (2 * largest)) plates

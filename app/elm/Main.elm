@@ -136,4 +136,9 @@ liftGroup lift max =
 
 calcWeightTarget : Int -> Float -> String -> Html Msg
 calcWeightTarget max percent count =
-    text (String.fromFloat (percent * toFloat max) ++ " lbs x" ++ count)
+    text (roundToFive (percent * toFloat max) ++ " lbs x" ++ count)
+
+
+roundToFive : Float -> String
+roundToFive weight =
+    String.fromFloat (5 * Round.floorNum 0 (weight / 5))

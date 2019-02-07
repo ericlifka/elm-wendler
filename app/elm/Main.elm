@@ -4,7 +4,6 @@ import Browser exposing (sandbox)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
-import Round
 
 
 {-| This creates the most basic sort of Elm progam available in the
@@ -30,6 +29,8 @@ type alias Model =
     , squat : Int
     , deadlift : Int
     , press : Int
+    , bar : Float
+    , plates : List Float
     }
 
 
@@ -39,6 +40,8 @@ initalModel =
     , squat = 85
     , deadlift = 110
     , press = 45
+    , bar = 45
+    , plates = [ 45, 35, 25, 10, 5, 2.5 ]
     }
 
 
@@ -83,10 +86,10 @@ view model =
             , liftMaxRow "Press" model.press AddPress
             ]
         , div [ class "lift-groups" ]
-            [ liftGroup "Bench" model.bench
-            , liftGroup "Squat" model.squat
-            , liftGroup "Deadlift" model.deadlift
-            , liftGroup "Press" model.press
+            [ liftGroup model "Bench" model.bench
+            , liftGroup model "Squat" model.squat
+            , liftGroup model "Deadlift" model.deadlift
+            , liftGroup model "Press" model.press
             ]
         ]
 
@@ -103,42 +106,73 @@ liftMaxRow lift value addLift =
         ]
 
 
-liftGroup : String -> Int -> Html Msg
-liftGroup lift max =
+liftGroup : Model -> String -> Int -> Html Msg
+liftGroup model lift max =
     div [ class ("group " ++ lift) ]
         [ button [ class "group-header header" ] [ text lift ]
         , div [ class "week deload" ]
             [ button [ class "row header" ] [ text "warmup / deload" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.4 "5" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.5 "5" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.6 "5" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.4 "5" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.5 "5" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.6 "5" ]
             ]
         , div [ class "week 555" ]
             [ button [ class "row header" ] [ text "555" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.65 "5" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.75 "5" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.85 "5+" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.65 "5" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.75 "5" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.85 "5+" ]
             ]
         , div [ class "week 333" ]
             [ button [ class "row header" ] [ text "333" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.7 "3" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.8 "3" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.9 "3+" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.7 "3" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.8 "3" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.9 "3+" ]
             ]
         , div [ class "week 531" ]
             [ button [ class "row header" ] [ text "531" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.75 "5" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.85 "3" ]
-            , div [ class "row" ] [ calcWeightTarget max 0.95 "1+" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.75 "5" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.85 "3" ]
+            , div [ class "row" ] [ calcWeightTarget model max 0.95 "1+" ]
             ]
         ]
 
 
-calcWeightTarget : Int -> Float -> String -> Html Msg
-calcWeightTarget max percent count =
-    text (roundToFive (percent * toFloat max) ++ " lbs x" ++ count)
+calcWeightTarget : Model -> Int -> Float -> String -> Html Msg
+calcWeightTarget model max percent count =
+    let
+        lift : Float
+        lift =
+            roundToFive (percent * toFloat max)
+
+        plates : List Float
+        plates =
+            calcPlates (lift - model.bar) model.plates
+
+        plateDisplay : String
+        plateDisplay =
+            String.join ", " (List.map String.fromFloat plates)
+    in
+    text (String.fromFloat lift ++ " lbs x" ++ count ++ plateDisplay)
 
 
-roundToFive : Float -> String
+roundToFive : Float -> Float
 roundToFive weight =
-    String.fromFloat (5 * Round.floorNum 0 (weight / 5))
+    toFloat (5 * round (weight / 5))
+
+
+calcPlates : Float -> List Float -> List Float
+calcPlates remaining plates =
+    if remaining < 0 then
+        []
+
+    else
+        case plates of
+            [] ->
+                []
+
+            largest :: rest ->
+                if (2 * largest) > remaining then
+                    calcPlates remaining rest
+
+                else
+                    largest :: calcPlates (remaining - (2 * largest)) plates

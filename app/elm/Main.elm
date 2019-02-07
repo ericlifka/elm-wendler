@@ -4,6 +4,7 @@ import Browser exposing (sandbox)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
+import Round
 
 
 {-| This creates the most basic sort of Elm progam available in the
@@ -34,10 +35,10 @@ type alias Model =
 
 initalModel : Model
 initalModel =
-    { bench = 0
-    , squat = 0
-    , deadlift = 0
-    , press = 0
+    { bench = 65
+    , squat = 85
+    , deadlift = 110
+    , press = 45
     }
 
 
@@ -103,31 +104,36 @@ liftMaxRow lift value addLift =
 
 
 liftGroup : String -> Int -> Html Msg
-liftGroup lift value =
+liftGroup lift max =
     div [ class ("group " ++ lift) ]
         [ button [ class "group-header header" ] [ text lift ]
         , div [ class "week deload" ]
             [ button [ class "row header" ] [ text "warmup / deload" ]
-            , div [ class "row" ] [ text "40% x5" ]
-            , div [ class "row" ] [ text "50% x5" ]
-            , div [ class "row" ] [ text "60% x5" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.4 "5" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.5 "5" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.6 "5" ]
             ]
         , div [ class "week 555" ]
             [ button [ class "row header" ] [ text "555" ]
-            , div [ class "row" ] [ text "65% x5" ]
-            , div [ class "row" ] [ text "75% x5" ]
-            , div [ class "row" ] [ text "85% x5+" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.65 "5" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.75 "5" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.85 "5+" ]
             ]
         , div [ class "week 333" ]
             [ button [ class "row header" ] [ text "333" ]
-            , div [ class "row" ] [ text "70% x3" ]
-            , div [ class "row" ] [ text "80% x3" ]
-            , div [ class "row" ] [ text "90% x3+" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.7 "3" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.8 "3" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.9 "3+" ]
             ]
         , div [ class "week 531" ]
             [ button [ class "row header" ] [ text "531" ]
-            , div [ class "row" ] [ text "75% x5" ]
-            , div [ class "row" ] [ text "85% x3" ]
-            , div [ class "row" ] [ text "95% x1+" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.75 "5" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.85 "3" ]
+            , div [ class "row" ] [ calcWeightTarget max 0.95 "1+" ]
             ]
         ]
+
+
+calcWeightTarget : Int -> Float -> String -> Html Msg
+calcWeightTarget max percent count =
+    text (String.fromFloat (percent * toFloat max) ++ " lbs x" ++ count)

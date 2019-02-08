@@ -252,14 +252,14 @@ createLiftWeek model lift visible toggleMsg name specs =
 
 
 createLiftTargetRow : Model -> Int -> ( Float, String ) -> Html Msg
-createLiftTargetRow model max spec =
+createLiftTargetRow model liftMax spec =
     let
         ( percent, count ) =
             spec
 
         lift : Float
         lift =
-            roundToFive (percent * toFloat max)
+            max model.bar (roundToFive (percent * toFloat liftMax))
 
         plates : List Float
         plates =

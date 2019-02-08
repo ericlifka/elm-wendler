@@ -35,6 +35,10 @@ type alias Model =
     , squatVisible : Bool
     , deadliftVisible : Bool
     , pressVisible : Bool
+    , warmupVisible : Bool
+    , fiveWeekVisible : Bool
+    , threeWeekVisible : Bool
+    , oneWeekVisible : Bool
     }
 
 
@@ -50,6 +54,10 @@ initalModel =
     , squatVisible = False
     , deadliftVisible = False
     , pressVisible = False
+    , warmupVisible = True
+    , fiveWeekVisible = False
+    , threeWeekVisible = False
+    , oneWeekVisible = False
     }
 
 
@@ -66,6 +74,10 @@ type Msg
     | ToggleSquat
     | ToggleDeadlift
     | TogglePress
+    | ToggleWarmup
+    | ToggleFiveWeek
+    | ToggleThreeWeek
+    | ToggleOneWeek
 
 
 update : Msg -> Model -> Model
@@ -113,6 +125,38 @@ update msg model =
                 , squatVisible = False
                 , deadliftVisible = False
                 , pressVisible = not model.pressVisible
+            }
+
+        ToggleWarmup ->
+            { model
+                | warmupVisible = not model.warmupVisible
+                , fiveWeekVisible = False
+                , threeWeekVisible = False
+                , oneWeekVisible = False
+            }
+
+        ToggleFiveWeek ->
+            { model
+                | warmupVisible = False
+                , fiveWeekVisible = not model.fiveWeekVisible
+                , threeWeekVisible = False
+                , oneWeekVisible = False
+            }
+
+        ToggleThreeWeek ->
+            { model
+                | warmupVisible = False
+                , fiveWeekVisible = False
+                , threeWeekVisible = not model.threeWeekVisible
+                , oneWeekVisible = False
+            }
+
+        ToggleOneWeek ->
+            { model
+                | warmupVisible = False
+                , fiveWeekVisible = False
+                , threeWeekVisible = False
+                , oneWeekVisible = not model.oneWeekVisible
             }
 
 
@@ -164,26 +208,66 @@ liftGroup model lift max visible toggleVisible =
             , class "group-header header"
             ]
             [ text lift ]
-        , div [ class "week deload" ]
-            [ button [ class "row header" ] [ text "warmup / deload" ]
+        , div
+            [ classList
+                [ ( "week", True )
+                , ( "warmup", True )
+                , ( "hidden", not model.warmupVisible )
+                ]
+            ]
+            [ button
+                [ onClick ToggleWarmup
+                , class "row header"
+                ]
+                [ text "warmup / deload" ]
             , createLiftTargetRow model max 0.4 "5"
             , createLiftTargetRow model max 0.5 "5"
             , createLiftTargetRow model max 0.6 "5"
             ]
-        , div [ class "week 555" ]
-            [ button [ class "row header" ] [ text "5-5-5" ]
+        , div
+            [ classList
+                [ ( "week", True )
+                , ( "555", True )
+                , ( "hidden", not model.fiveWeekVisible )
+                ]
+            ]
+            [ button
+                [ onClick ToggleFiveWeek
+                , class "row header"
+                ]
+                [ text "5-5-5" ]
             , createLiftTargetRow model max 0.65 "5"
             , createLiftTargetRow model max 0.75 "5"
             , createLiftTargetRow model max 0.85 "5+"
             ]
-        , div [ class "week 333" ]
-            [ button [ class "row header" ] [ text "3-3-3" ]
+        , div
+            [ classList
+                [ ( "week", True )
+                , ( "333", True )
+                , ( "hidden", not model.threeWeekVisible )
+                ]
+            ]
+            [ button
+                [ onClick ToggleThreeWeek
+                , class "row header"
+                ]
+                [ text "3-3-3" ]
             , createLiftTargetRow model max 0.7 "3"
             , createLiftTargetRow model max 0.8 "3"
             , createLiftTargetRow model max 0.9 "3+"
             ]
-        , div [ class "week 531" ]
-            [ button [ class "row header" ] [ text "5-3-1" ]
+        , div
+            [ classList
+                [ ( "week", True )
+                , ( "531", True )
+                , ( "hidden", not model.oneWeekVisible )
+                ]
+            ]
+            [ button
+                [ onClick ToggleOneWeek
+                , class "row header"
+                ]
+                [ text "5-3-1" ]
             , createLiftTargetRow model max 0.75 "5"
             , createLiftTargetRow model max 0.85 "3"
             , createLiftTargetRow model max 0.95 "1+"

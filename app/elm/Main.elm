@@ -84,16 +84,36 @@ update msg model =
             { model | press = model.press + value }
 
         ToggleBench ->
-            { model | benchVisible = not model.benchVisible }
+            { model
+                | benchVisible = not model.benchVisible
+                , squatVisible = False
+                , deadliftVisible = False
+                , pressVisible = False
+            }
 
         ToggleSquat ->
-            { model | squatVisible = not model.squatVisible }
+            { model
+                | benchVisible = False
+                , squatVisible = not model.squatVisible
+                , deadliftVisible = False
+                , pressVisible = False
+            }
 
         ToggleDeadlift ->
-            { model | deadliftVisible = not model.deadliftVisible }
+            { model
+                | benchVisible = False
+                , squatVisible = False
+                , deadliftVisible = not model.deadliftVisible
+                , pressVisible = False
+            }
 
         TogglePress ->
-            { model | pressVisible = not model.pressVisible }
+            { model
+                | benchVisible = False
+                , squatVisible = False
+                , deadliftVisible = False
+                , pressVisible = not model.pressVisible
+            }
 
 
 

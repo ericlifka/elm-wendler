@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser exposing (sandbox)
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 
@@ -112,33 +112,33 @@ liftGroup model lift max =
         [ button [ class "group-header header" ] [ text lift ]
         , div [ class "week deload" ]
             [ button [ class "row header" ] [ text "warmup / deload" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.4 "5" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.5 "5" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.6 "5" ]
+            , createLiftTargetRow model max 0.4 "5"
+            , createLiftTargetRow model max 0.5 "5"
+            , createLiftTargetRow model max 0.6 "5"
             ]
         , div [ class "week 555" ]
             [ button [ class "row header" ] [ text "555" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.65 "5" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.75 "5" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.85 "5+" ]
+            , createLiftTargetRow model max 0.65 "5"
+            , createLiftTargetRow model max 0.75 "5"
+            , createLiftTargetRow model max 0.85 "5+"
             ]
         , div [ class "week 333" ]
             [ button [ class "row header" ] [ text "333" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.7 "3" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.8 "3" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.9 "3+" ]
+            , createLiftTargetRow model max 0.7 "3"
+            , createLiftTargetRow model max 0.8 "3"
+            , createLiftTargetRow model max 0.9 "3+"
             ]
         , div [ class "week 531" ]
             [ button [ class "row header" ] [ text "531" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.75 "5" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.85 "3" ]
-            , div [ class "row" ] [ calcWeightTarget model max 0.95 "1+" ]
+            , createLiftTargetRow model max 0.75 "5"
+            , createLiftTargetRow model max 0.85 "3"
+            , createLiftTargetRow model max 0.95 "1+"
             ]
         ]
 
 
-calcWeightTarget : Model -> Int -> Float -> String -> Html Msg
-calcWeightTarget model max percent count =
+createLiftTargetRow : Model -> Int -> Float -> String -> Html Msg
+createLiftTargetRow model max percent count =
     let
         lift : Float
         lift =
@@ -152,7 +152,11 @@ calcWeightTarget model max percent count =
         plateDisplay =
             String.join ", " (List.map String.fromFloat plates)
     in
-    text (String.fromFloat lift ++ " lbs x" ++ count ++ plateDisplay)
+    div [ class "row" ]
+        [ span [ class "item" ] [ text (String.fromFloat lift ++ " lbs") ]
+        , span [ class "item" ] [ text ("x" ++ count) ]
+        , span [ class "item" ] [ text ("[" ++ plateDisplay ++ "]") ]
+        ]
 
 
 roundToFive : Float -> Float

@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (sandbox)
 import Html exposing (Html, button, div, span, text)
-import Html.Attributes exposing (class, id)
+import Html.Attributes exposing (class, classList, id)
 import Html.Events exposing (onClick)
 
 
@@ -31,6 +31,10 @@ type alias Model =
     , press : Int
     , bar : Float
     , plates : List Float
+    , benchVisible : Bool
+    , squatVisible : Bool
+    , deadliftVisible : Bool
+    , pressVisible : Bool
     }
 
 
@@ -42,6 +46,10 @@ initalModel =
     , press = 45
     , bar = 45
     , plates = [ 45, 35, 25, 10, 5, 2.5 ]
+    , benchVisible = False
+    , squatVisible = False
+    , deadliftVisible = False
+    , pressVisible = False
     }
 
 
@@ -54,6 +62,10 @@ type Msg
     | AddSquat Int
     | AddDeadlift Int
     | AddPress Int
+    | ToggleBench
+    | ToggleSquat
+    | ToggleDeadlift
+    | TogglePress
 
 
 update : Msg -> Model -> Model
@@ -71,6 +83,18 @@ update msg model =
         AddPress value ->
             { model | press = model.press + value }
 
+        ToggleBench ->
+            { model | benchVisible = not model.benchVisible }
+
+        ToggleSquat ->
+            { model | squatVisible = not model.squatVisible }
+
+        ToggleDeadlift ->
+            { model | deadliftVisible = not model.deadliftVisible }
+
+        TogglePress ->
+            { model | pressVisible = not model.pressVisible }
+
 
 
 -- View
@@ -86,10 +110,10 @@ view model =
             , liftMaxRow "Press" model.press AddPress
             ]
         , div [ class "lift-groups" ]
-            [ liftGroup model "Bench" model.bench
-            , liftGroup model "Squat" model.squat
-            , liftGroup model "Deadlift" model.deadlift
-            , liftGroup model "Press" model.press
+            [ liftGroup model "Bench" model.bench model.benchVisible ToggleBench
+            , liftGroup model "Squat" model.squat model.squatVisible ToggleSquat
+            , liftGroup model "Deadlift" model.deadlift model.deadliftVisible ToggleDeadlift
+            , liftGroup model "Press" model.press model.pressVisible TogglePress
             ]
         ]
 
@@ -106,10 +130,20 @@ liftMaxRow lift value addLift =
         ]
 
 
-liftGroup : Model -> String -> Int -> Html Msg
-liftGroup model lift max =
-    div [ class ("group " ++ lift) ]
-        [ button [ class "group-header header" ] [ text lift ]
+liftGroup : Model -> String -> Int -> Bool -> Msg -> Html Msg
+liftGroup model lift max visible toggleVisible =
+    div
+        [ classList
+            [ ( "group", True )
+            , ( lift, True )
+            , ( "visible", visible )
+            ]
+        ]
+        [ button
+            [ onClick toggleVisible
+            , class "group-header header"
+            ]
+            [ text lift ]
         , div [ class "week deload" ]
             [ button [ class "row header" ] [ text "warmup / deload" ]
             , createLiftTargetRow model max 0.4 "5"

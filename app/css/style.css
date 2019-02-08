@@ -45,6 +45,16 @@
   flex-direction: column;
 }
 
+.lift-groups .group .week {
+  display: hidden;
+  height: 0px;
+  overflow: hidden;
+}
+.lift-groups .group.visible .week {
+  visibility: visible;
+  height: auto;
+}
+
 .lift-groups .row {
   display: flex;
   flex-direction: row;

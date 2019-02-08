@@ -14,7 +14,7 @@ documentation @ <https://package.elm-lang.org/packages/elm/browser/latest/>
 main : Program () Model Msg
 main =
     Browser.sandbox
-        { init = initalModel
+        { init = initialModel
         , update = update
         , view = view
         }
@@ -24,17 +24,20 @@ main =
 -- Model
 
 
+type alias Lift =
+    { name : String
+    , max : Int
+    , visible : Bool
+    }
+
+
 type alias Model =
-    { bench : Int
-    , squat : Int
-    , deadlift : Int
-    , press : Int
+    { bench : Lift
+    , squat : Lift
+    , deadlift : Lift
+    , press : Lift
     , bar : Float
     , plates : List Float
-    , benchVisible : Bool
-    , squatVisible : Bool
-    , deadliftVisible : Bool
-    , pressVisible : Bool
     , warmupVisible : Bool
     , fiveWeekVisible : Bool
     , threeWeekVisible : Bool
@@ -42,18 +45,30 @@ type alias Model =
     }
 
 
-initalModel : Model
-initalModel =
-    { bench = 65
-    , squat = 85
-    , deadlift = 110
-    , press = 45
+initialModel : Model
+initialModel =
+    { bench =
+        { name = "Bench"
+        , max = 65
+        , visible = False
+        }
+    , squat =
+        { name = "Squat"
+        , max = 85
+        , visible = False
+        }
+    , deadlift =
+        { name = "Deadlift"
+        , max = 135
+        , visible = False
+        }
+    , press =
+        { name = "Press"
+        , max = 45
+        , visible = False
+        }
     , bar = 45
     , plates = [ 45, 35, 25, 10, 5, 2.5 ]
-    , benchVisible = False
-    , squatVisible = False
-    , deadliftVisible = False
-    , pressVisible = False
     , warmupVisible = True
     , fiveWeekVisible = False
     , threeWeekVisible = False
@@ -84,47 +99,47 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         AddBench value ->
-            { model | bench = model.bench + value }
+            { model | bench = updateLiftMax model.bench value }
 
         AddSquat value ->
-            { model | squat = model.squat + value }
+            { model | squat = updateLiftMax model.squat value }
 
         AddDeadlift value ->
-            { model | deadlift = model.deadlift + value }
+            { model | deadlift = updateLiftMax model.deadlift value }
 
         AddPress value ->
-            { model | press = model.press + value }
+            { model | press = updateLiftMax model.press value }
 
         ToggleBench ->
             { model
-                | benchVisible = not model.benchVisible
-                , squatVisible = False
-                , deadliftVisible = False
-                , pressVisible = False
+                | bench = toggleSection model.bench
+                , squat = hideSection model.squat
+                , deadlift = hideSection model.deadlift
+                , press = hideSection model.press
             }
 
         ToggleSquat ->
             { model
-                | benchVisible = False
-                , squatVisible = not model.squatVisible
-                , deadliftVisible = False
-                , pressVisible = False
+                | bench = hideSection model.bench
+                , squat = toggleSection model.squat
+                , deadlift = hideSection model.deadlift
+                , press = hideSection model.press
             }
 
         ToggleDeadlift ->
             { model
-                | benchVisible = False
-                , squatVisible = False
-                , deadliftVisible = not model.deadliftVisible
-                , pressVisible = False
+                | bench = hideSection model.bench
+                , squat = hideSection model.squat
+                , deadlift = toggleSection model.deadlift
+                , press = hideSection model.press
             }
 
         TogglePress ->
             { model
-                | benchVisible = False
-                , squatVisible = False
-                , deadliftVisible = False
-                , pressVisible = not model.pressVisible
+                | bench = hideSection model.bench
+                , squat = hideSection model.squat
+                , deadlift = hideSection model.deadlift
+                , press = toggleSection model.press
             }
 
         ToggleWarmup ->
@@ -168,46 +183,46 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "lift-maxes" ]
-            [ liftMaxRow "Bench" model.bench AddBench
-            , liftMaxRow "Squat" model.squat AddSquat
-            , liftMaxRow "Deadlift" model.deadlift AddDeadlift
-            , liftMaxRow "Press" model.press AddPress
+            [ liftMaxRow model.bench AddBench
+            , liftMaxRow model.squat AddSquat
+            , liftMaxRow model.deadlift AddDeadlift
+            , liftMaxRow model.press AddPress
             ]
         , div [ class "lift-groups" ]
-            [ liftGroup model "Bench" model.bench model.benchVisible ToggleBench
-            , liftGroup model "Squat" model.squat model.squatVisible ToggleSquat
-            , liftGroup model "Deadlift" model.deadlift model.deadliftVisible ToggleDeadlift
-            , liftGroup model "Press" model.press model.pressVisible TogglePress
+            [ liftGroup model model.bench ToggleBench
+            , liftGroup model model.squat ToggleSquat
+            , liftGroup model model.deadlift ToggleDeadlift
+            , liftGroup model model.press TogglePress
             ]
         ]
 
 
-liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
-liftMaxRow lift value addLift =
-    div [ class ("row " ++ lift) ]
+liftMaxRow : Lift -> (Int -> Msg) -> Html Msg
+liftMaxRow lift addLift =
+    div [ class ("row " ++ lift.name) ]
         [ div [ class "label" ]
-            [ text lift ]
+            [ text lift.name ]
         , div [ class "value" ]
-            [ text (String.fromInt value) ]
+            [ text (String.fromInt lift.max) ]
         , button [ onClick (addLift 5) ] [ text "+5" ]
         , button [ onClick (addLift -5) ] [ text "-5" ]
         ]
 
 
-liftGroup : Model -> String -> Int -> Bool -> Msg -> Html Msg
-liftGroup model lift max visible toggleVisible =
+liftGroup : Model -> Lift -> Msg -> Html Msg
+liftGroup model lift toggleVisible =
     div
         [ classList
             [ ( "group", True )
-            , ( lift, True )
-            , ( "visible", visible )
+            , ( lift.name, True )
+            , ( "visible", lift.visible )
             ]
         ]
         [ button
             [ onClick toggleVisible
             , class "group-header header"
             ]
-            [ text lift ]
+            [ text lift.name ]
         , div
             [ classList
                 [ ( "week", True )
@@ -220,9 +235,9 @@ liftGroup model lift max visible toggleVisible =
                 , class "row header"
                 ]
                 [ text "warmup / deload" ]
-            , createLiftTargetRow model max 0.4 "5"
-            , createLiftTargetRow model max 0.5 "5"
-            , createLiftTargetRow model max 0.6 "5"
+            , createLiftTargetRow model lift.max 0.4 "5"
+            , createLiftTargetRow model lift.max 0.5 "5"
+            , createLiftTargetRow model lift.max 0.6 "5"
             ]
         , div
             [ classList
@@ -236,9 +251,9 @@ liftGroup model lift max visible toggleVisible =
                 , class "row header"
                 ]
                 [ text "5-5-5" ]
-            , createLiftTargetRow model max 0.65 "5"
-            , createLiftTargetRow model max 0.75 "5"
-            , createLiftTargetRow model max 0.85 "5+"
+            , createLiftTargetRow model lift.max 0.65 "5"
+            , createLiftTargetRow model lift.max 0.75 "5"
+            , createLiftTargetRow model lift.max 0.85 "5+"
             ]
         , div
             [ classList
@@ -252,9 +267,9 @@ liftGroup model lift max visible toggleVisible =
                 , class "row header"
                 ]
                 [ text "3-3-3" ]
-            , createLiftTargetRow model max 0.7 "3"
-            , createLiftTargetRow model max 0.8 "3"
-            , createLiftTargetRow model max 0.9 "3+"
+            , createLiftTargetRow model lift.max 0.7 "3"
+            , createLiftTargetRow model lift.max 0.8 "3"
+            , createLiftTargetRow model lift.max 0.9 "3+"
             ]
         , div
             [ classList
@@ -268,9 +283,9 @@ liftGroup model lift max visible toggleVisible =
                 , class "row header"
                 ]
                 [ text "5-3-1" ]
-            , createLiftTargetRow model max 0.75 "5"
-            , createLiftTargetRow model max 0.85 "3"
-            , createLiftTargetRow model max 0.95 "1+"
+            , createLiftTargetRow model lift.max 0.75 "5"
+            , createLiftTargetRow model lift.max 0.85 "3"
+            , createLiftTargetRow model lift.max 0.95 "1+"
             ]
         ]
 
@@ -295,6 +310,25 @@ createLiftTargetRow model max percent count =
         , span [ class "count" ] [ text ("x" ++ count) ]
         , span [ class "plates" ] [ text ("[" ++ plateDisplay ++ "]") ]
         ]
+
+
+
+-- Helpers
+
+
+updateLiftMax : Lift -> Int -> Lift
+updateLiftMax lift value =
+    { lift | max = lift.max + value }
+
+
+hideSection : Lift -> Lift
+hideSection section =
+    { section | visible = False }
+
+
+toggleSection : Lift -> Lift
+toggleSection section =
+    { section | visible = not section.visible }
 
 
 roundToFive : Float -> Float

@@ -297,7 +297,7 @@ toggleSection section =
 
 roundToFive : Float -> Float
 roundToFive weight =
-    toFloat (5 * round (weight / 5))
+    toFloat (5 * floor (weight / 5))
 
 
 calcPlates : Float -> List Float -> List Float

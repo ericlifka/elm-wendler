@@ -223,76 +223,40 @@ liftGroup model lift toggleVisible =
             , class "group-header header"
             ]
             [ text lift.name ]
-        , div
-            [ classList
-                [ ( "week", True )
-                , ( "warmup", True )
-                , ( "hidden", not model.warmupVisible )
-                ]
-            ]
-            [ button
-                [ onClick ToggleWarmup
-                , class "row header"
-                ]
-                [ text "warmup / deload" ]
-            , createLiftTargetRow model lift.max 0.4 "5"
-            , createLiftTargetRow model lift.max 0.5 "5"
-            , createLiftTargetRow model lift.max 0.6 "5"
-            ]
-        , div
-            [ classList
-                [ ( "week", True )
-                , ( "555", True )
-                , ( "hidden", not model.fiveWeekVisible )
-                ]
-            ]
-            [ button
-                [ onClick ToggleFiveWeek
-                , class "row header"
-                ]
-                [ text "5-5-5" ]
-            , createLiftTargetRow model lift.max 0.65 "5"
-            , createLiftTargetRow model lift.max 0.75 "5"
-            , createLiftTargetRow model lift.max 0.85 "5+"
-            ]
-        , div
-            [ classList
-                [ ( "week", True )
-                , ( "333", True )
-                , ( "hidden", not model.threeWeekVisible )
-                ]
-            ]
-            [ button
-                [ onClick ToggleThreeWeek
-                , class "row header"
-                ]
-                [ text "3-3-3" ]
-            , createLiftTargetRow model lift.max 0.7 "3"
-            , createLiftTargetRow model lift.max 0.8 "3"
-            , createLiftTargetRow model lift.max 0.9 "3+"
-            ]
-        , div
-            [ classList
-                [ ( "week", True )
-                , ( "531", True )
-                , ( "hidden", not model.oneWeekVisible )
-                ]
-            ]
-            [ button
-                [ onClick ToggleOneWeek
-                , class "row header"
-                ]
-                [ text "5-3-1" ]
-            , createLiftTargetRow model lift.max 0.75 "5"
-            , createLiftTargetRow model lift.max 0.85 "3"
-            , createLiftTargetRow model lift.max 0.95 "1+"
-            ]
+        , createLiftWeek model lift model.warmupVisible ToggleWarmup "Warmup/Deload" [ ( 0.4, "5" ), ( 0.5, "5" ), ( 0.6, "5" ) ]
+        , createLiftWeek model lift model.fiveWeekVisible ToggleFiveWeek "5-5-5" [ ( 0.65, "5" ), ( 0.75, "5" ), ( 0.85, "5+" ) ]
+        , createLiftWeek model lift model.threeWeekVisible ToggleThreeWeek "3-3-3" [ ( 0.7, "3" ), ( 0.8, "3" ), ( 0.9, "3+" ) ]
+        , createLiftWeek model lift model.oneWeekVisible ToggleOneWeek "5-3-1" [ ( 0.75, "5" ), ( 0.85, "3" ), ( 0.95, "1+" ) ]
         ]
 
 
-createLiftTargetRow : Model -> Int -> Float -> String -> Html Msg
-createLiftTargetRow model max percent count =
+createLiftWeek : Model -> Lift -> Bool -> Msg -> String -> List ( Float, String ) -> Html Msg
+createLiftWeek model lift visible toggleMsg name specs =
     let
+        buttonElement =
+            button
+                [ onClick toggleMsg, class "row header" ]
+                [ text name ]
+
+        rowList =
+            List.map (createLiftTargetRow model lift.max) specs
+    in
+    div
+        [ classList
+            [ ( "week", True )
+            , ( name, True )
+            , ( "hidden", not visible )
+            ]
+        ]
+        (buttonElement :: rowList)
+
+
+createLiftTargetRow : Model -> Int -> ( Float, String ) -> Html Msg
+createLiftTargetRow model max spec =
+    let
+        ( percent, count ) =
+            spec
+
         lift : Float
         lift =
             roundToFive (percent * toFloat max)

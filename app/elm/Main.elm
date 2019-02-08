@@ -117,19 +117,19 @@ liftGroup model lift max =
             , createLiftTargetRow model max 0.6 "5"
             ]
         , div [ class "week 555" ]
-            [ button [ class "row header" ] [ text "555" ]
+            [ button [ class "row header" ] [ text "5-5-5" ]
             , createLiftTargetRow model max 0.65 "5"
             , createLiftTargetRow model max 0.75 "5"
             , createLiftTargetRow model max 0.85 "5+"
             ]
         , div [ class "week 333" ]
-            [ button [ class "row header" ] [ text "333" ]
+            [ button [ class "row header" ] [ text "3-3-3" ]
             , createLiftTargetRow model max 0.7 "3"
             , createLiftTargetRow model max 0.8 "3"
             , createLiftTargetRow model max 0.9 "3+"
             ]
         , div [ class "week 531" ]
-            [ button [ class "row header" ] [ text "531" ]
+            [ button [ class "row header" ] [ text "5-3-1" ]
             , createLiftTargetRow model max 0.75 "5"
             , createLiftTargetRow model max 0.85 "3"
             , createLiftTargetRow model max 0.95 "1+"
@@ -152,10 +152,10 @@ createLiftTargetRow model max percent count =
         plateDisplay =
             String.join ", " (List.map String.fromFloat plates)
     in
-    div [ class "row" ]
-        [ span [ class "item" ] [ text (String.fromFloat lift ++ " lbs") ]
-        , span [ class "item" ] [ text ("x" ++ count) ]
-        , span [ class "item" ] [ text ("[" ++ plateDisplay ++ "]") ]
+    div [ class "row lift" ]
+        [ span [ class "weight" ] [ text (String.fromFloat lift ++ " lbs") ]
+        , span [ class "count" ] [ text ("x" ++ count) ]
+        , span [ class "plates" ] [ text ("[" ++ plateDisplay ++ "]") ]
         ]
 
 

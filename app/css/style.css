@@ -36,10 +36,39 @@
 .lift-groups .header {
   margin-left: -20px;
   margin-top: 5px;
+  padding-left: 10px;
 }
 
 .lift-groups .week {
   padding-left: 20px;
   display: flex;
   flex-direction: column;
+}
+
+.lift-groups .row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.lift-groups .row.lift {
+  padding: 10px 0;
+  border-bottom: 1px solid #cfcfcf;
+}
+
+.lift-groups .row > span {
+  padding: 0 10px;
+}
+.lift-groups .row .weight {
+  font-size: 24px;
+  color: #000000;
+  min-width: 90px;
+}
+.lift-groups .row .count {
+  min-width: 60px;
+}
+.lift-groups .row .plates {
+  font-size: 20px;
+  align-self: center;
+  color: #777777;
 }

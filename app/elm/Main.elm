@@ -171,10 +171,10 @@ view model =
             , liftMaxRow "Press" model.press AddPress
             ]
         , div [ class "lift-groups" ]
-            [ liftGroup "Bench" model model.bench ToggleGroup BenchGroup
-            , liftGroup "Squat" model model.squat ToggleGroup SquatGroup
-            , liftGroup "Deadlift" model model.deadlift ToggleGroup DeadliftGroup
-            , liftGroup "Press" model model.press ToggleGroup PressGroup
+            [ liftGroup "Bench" model model.bench BenchGroup
+            , liftGroup "Squat" model model.squat SquatGroup
+            , liftGroup "Deadlift" model model.deadlift DeadliftGroup
+            , liftGroup "Press" model model.press PressGroup
             ]
         ]
 
@@ -191,8 +191,8 @@ liftMaxRow name lift addLift =
         ]
 
 
-liftGroup : String -> Model -> Int -> (OpenGroup -> Msg) -> OpenGroup -> Html Msg
-liftGroup name model lift toggleGroup group =
+liftGroup : String -> Model -> Int -> OpenGroup -> Html Msg
+liftGroup name model lift group =
     div
         [ classList
             [ ( "group", True )
@@ -201,21 +201,21 @@ liftGroup name model lift toggleGroup group =
             ]
         ]
         [ button
-            [ onClick (toggleGroup group), class "group-header header" ]
+            [ onClick (ToggleGroup group), class "group-header header" ]
             [ text name ]
-        , createLiftWorkout model lift workouts.warmup ToggleWorkout WarmupWorkout
-        , createLiftWorkout model lift workouts.five ToggleWorkout FiveWorkout
-        , createLiftWorkout model lift workouts.three ToggleWorkout ThreeWorkout
-        , createLiftWorkout model lift workouts.one ToggleWorkout OneWorkout
+        , createLiftWorkout model lift workouts.warmup WarmupWorkout
+        , createLiftWorkout model lift workouts.five FiveWorkout
+        , createLiftWorkout model lift workouts.three ThreeWorkout
+        , createLiftWorkout model lift workouts.one OneWorkout
         ]
 
 
-createLiftWorkout : Model -> Int -> Workout -> (OpenWorkout -> Msg) -> OpenWorkout -> Html Msg
-createLiftWorkout model lift workout toggleVisible sectionMsg =
+createLiftWorkout : Model -> Int -> Workout -> OpenWorkout -> Html Msg
+createLiftWorkout model lift workout sectionMsg =
     let
         buttonElement =
             button
-                [ onClick (toggleVisible sectionMsg), class "row header" ]
+                [ onClick (ToggleWorkout sectionMsg), class "row header" ]
                 [ text workout.name ]
 
         rowList =

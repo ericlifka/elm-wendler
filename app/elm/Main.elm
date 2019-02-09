@@ -24,13 +24,6 @@ main =
 -- Model
 
 
-type alias Lift =
-    { name : String
-    , max : Int
-    , visible : Bool
-    }
-
-
 type OpenWorkout
     = WarmupWorkout
     | FiveWorkout
@@ -38,41 +31,35 @@ type OpenWorkout
     | OneWorkout
 
 
+type OpenGroup
+    = None
+    | BenchGroup
+    | SquatGroup
+    | DeadliftGroup
+    | PressGroup
+
+
 type alias Model =
-    { bench : Lift
-    , squat : Lift
-    , deadlift : Lift
-    , press : Lift
+    { bench : Int
+    , squat : Int
+    , deadlift : Int
+    , press : Int
     , bar : Float
     , plates : List Float
+    , openGroup : OpenGroup
     , openWorkout : OpenWorkout
     }
 
 
 initialModel : Model
 initialModel =
-    { bench =
-        { name = "Bench"
-        , max = 65
-        , visible = False
-        }
-    , squat =
-        { name = "Squat"
-        , max = 85
-        , visible = False
-        }
-    , deadlift =
-        { name = "Deadlift"
-        , max = 135
-        , visible = False
-        }
-    , press =
-        { name = "Press"
-        , max = 45
-        , visible = False
-        }
+    { bench = 65
+    , squat = 85
+    , deadlift = 135
+    , press = 45
     , bar = 45
     , plates = [ 45, 35, 25, 10, 5, 2.5 ]
+    , openGroup = None
     , openWorkout = WarmupWorkout
     }
 
@@ -137,10 +124,7 @@ type Msg
     | AddSquat Int
     | AddDeadlift Int
     | AddPress Int
-    | ToggleBench
-    | ToggleSquat
-    | ToggleDeadlift
-    | TogglePress
+    | ToggleGroup OpenGroup
     | ToggleWorkout OpenWorkout
 
 
@@ -148,66 +132,29 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         AddBench value ->
-            { model | bench = updateLiftMax model.bench value }
+            { model | bench = model.bench + value }
 
         AddSquat value ->
-            { model | squat = updateLiftMax model.squat value }
+            { model | squat = model.squat + value }
 
         AddDeadlift value ->
-            { model | deadlift = updateLiftMax model.deadlift value }
+            { model | deadlift = model.deadlift + value }
 
         AddPress value ->
-            { model | press = updateLiftMax model.press value }
+            { model | press = model.press + value }
 
-        ToggleBench ->
+        ToggleGroup group ->
             { model
-                | bench = toggleSection model.bench
-                , squat = hideSection model.squat
-                , deadlift = hideSection model.deadlift
-                , press = hideSection model.press
-            }
+                | openGroup =
+                    if model.openGroup == group then
+                        None
 
-        ToggleSquat ->
-            { model
-                | bench = hideSection model.bench
-                , squat = toggleSection model.squat
-                , deadlift = hideSection model.deadlift
-                , press = hideSection model.press
-            }
-
-        ToggleDeadlift ->
-            { model
-                | bench = hideSection model.bench
-                , squat = hideSection model.squat
-                , deadlift = toggleSection model.deadlift
-                , press = hideSection model.press
-            }
-
-        TogglePress ->
-            { model
-                | bench = hideSection model.bench
-                , squat = hideSection model.squat
-                , deadlift = hideSection model.deadlift
-                , press = toggleSection model.press
+                    else
+                        group
             }
 
         ToggleWorkout workout ->
             { model | openWorkout = workout }
-
-
-updateLiftMax : Lift -> Int -> Lift
-updateLiftMax lift value =
-    { lift | max = lift.max + value }
-
-
-hideSection : Lift -> Lift
-hideSection section =
-    { section | visible = False }
-
-
-toggleSection : Lift -> Lift
-toggleSection section =
-    { section | visible = not section.visible }
 
 
 
@@ -218,44 +165,44 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "lift-maxes" ]
-            [ liftMaxRow model.bench AddBench
-            , liftMaxRow model.squat AddSquat
-            , liftMaxRow model.deadlift AddDeadlift
-            , liftMaxRow model.press AddPress
+            [ liftMaxRow "Bench" model.bench AddBench
+            , liftMaxRow "Squat" model.squat AddSquat
+            , liftMaxRow "Deadlift" model.deadlift AddDeadlift
+            , liftMaxRow "Press" model.press AddPress
             ]
         , div [ class "lift-groups" ]
-            [ liftGroup model model.bench ToggleBench
-            , liftGroup model model.squat ToggleSquat
-            , liftGroup model model.deadlift ToggleDeadlift
-            , liftGroup model model.press TogglePress
+            [ liftGroup "Bench" model model.bench ToggleGroup BenchGroup
+            , liftGroup "Squat" model model.squat ToggleGroup SquatGroup
+            , liftGroup "Deadlift" model model.deadlift ToggleGroup DeadliftGroup
+            , liftGroup "Press" model model.press ToggleGroup PressGroup
             ]
         ]
 
 
-liftMaxRow : Lift -> (Int -> Msg) -> Html Msg
-liftMaxRow lift addLift =
-    div [ class ("row " ++ lift.name) ]
+liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
+liftMaxRow name lift addLift =
+    div [ class ("row " ++ name) ]
         [ div [ class "label" ]
-            [ text lift.name ]
+            [ text name ]
         , div [ class "value" ]
-            [ text (String.fromInt lift.max) ]
+            [ text (String.fromInt lift) ]
         , button [ onClick (addLift 5) ] [ text "+5" ]
         , button [ onClick (addLift -5) ] [ text "-5" ]
         ]
 
 
-liftGroup : Model -> Lift -> Msg -> Html Msg
-liftGroup model lift toggleVisible =
+liftGroup : String -> Model -> Int -> (OpenGroup -> Msg) -> OpenGroup -> Html Msg
+liftGroup name model lift toggleGroup group =
     div
         [ classList
             [ ( "group", True )
-            , ( lift.name, True )
-            , ( "visible", lift.visible )
+            , ( name, True )
+            , ( "visible", model.openGroup == group )
             ]
         ]
         [ button
-            [ onClick toggleVisible, class "group-header header" ]
-            [ text lift.name ]
+            [ onClick (toggleGroup group), class "group-header header" ]
+            [ text name ]
         , createLiftWorkout model lift workouts.warmup ToggleWorkout WarmupWorkout
         , createLiftWorkout model lift workouts.five ToggleWorkout FiveWorkout
         , createLiftWorkout model lift workouts.three ToggleWorkout ThreeWorkout
@@ -263,7 +210,7 @@ liftGroup model lift toggleVisible =
         ]
 
 
-createLiftWorkout : Model -> Lift -> Workout -> (OpenWorkout -> Msg) -> OpenWorkout -> Html Msg
+createLiftWorkout : Model -> Int -> Workout -> (OpenWorkout -> Msg) -> OpenWorkout -> Html Msg
 createLiftWorkout model lift workout toggleVisible sectionMsg =
     let
         buttonElement =
@@ -272,7 +219,7 @@ createLiftWorkout model lift workout toggleVisible sectionMsg =
                 [ text workout.name ]
 
         rowList =
-            List.map (createLiftTargetRow model lift.max) workout.movements
+            List.map (createLiftTargetRow model lift) workout.movements
     in
     div
         [ classList

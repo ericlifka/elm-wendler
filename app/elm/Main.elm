@@ -76,6 +76,57 @@ initialModel =
     }
 
 
+type alias Workout =
+    { name : String
+    , movements : List ( Float, String )
+    }
+
+
+type alias Workouts =
+    { warmup : Workout
+    , five : Workout
+    , three : Workout
+    , one : Workout
+    }
+
+
+workouts : Workouts
+workouts =
+    { warmup =
+        { name = "Warmup/Deload"
+        , movements =
+            [ ( 0.4, "5" )
+            , ( 0.5, "5" )
+            , ( 0.6, "5" )
+            ]
+        }
+    , five =
+        { name = "5-5-5"
+        , movements =
+            [ ( 0.65, "5" )
+            , ( 0.75, "5" )
+            , ( 0.85, "5+" )
+            ]
+        }
+    , three =
+        { name = "3-3-3"
+        , movements =
+            [ ( 0.7, "3" )
+            , ( 0.8, "3" )
+            , ( 0.9, "3+" )
+            ]
+        }
+    , one =
+        { name = "5-3-1"
+        , movements =
+            [ ( 0.75, "5" )
+            , ( 0.85, "3" )
+            , ( 0.95, "1+" )
+            ]
+        }
+    }
+
+
 
 -- Update
 
@@ -223,28 +274,28 @@ liftGroup model lift toggleVisible =
             , class "group-header header"
             ]
             [ text lift.name ]
-        , createLiftWeek model lift model.warmupVisible ToggleWarmup "Warmup/Deload" [ ( 0.4, "5" ), ( 0.5, "5" ), ( 0.6, "5" ) ]
-        , createLiftWeek model lift model.fiveWeekVisible ToggleFiveWeek "5-5-5" [ ( 0.65, "5" ), ( 0.75, "5" ), ( 0.85, "5+" ) ]
-        , createLiftWeek model lift model.threeWeekVisible ToggleThreeWeek "3-3-3" [ ( 0.7, "3" ), ( 0.8, "3" ), ( 0.9, "3+" ) ]
-        , createLiftWeek model lift model.oneWeekVisible ToggleOneWeek "5-3-1" [ ( 0.75, "5" ), ( 0.85, "3" ), ( 0.95, "1+" ) ]
+        , createLiftWorkout model lift workouts.warmup model.warmupVisible ToggleWarmup
+        , createLiftWorkout model lift workouts.five model.fiveWeekVisible ToggleFiveWeek
+        , createLiftWorkout model lift workouts.three model.threeWeekVisible ToggleThreeWeek
+        , createLiftWorkout model lift workouts.one model.oneWeekVisible ToggleOneWeek
         ]
 
 
-createLiftWeek : Model -> Lift -> Bool -> Msg -> String -> List ( Float, String ) -> Html Msg
-createLiftWeek model lift visible toggleMsg name specs =
+createLiftWorkout : Model -> Lift -> Workout -> Bool -> Msg -> Html Msg
+createLiftWorkout model lift workout visible toggleMsg =
     let
         buttonElement =
             button
                 [ onClick toggleMsg, class "row header" ]
-                [ text name ]
+                [ text workout.name ]
 
         rowList =
-            List.map (createLiftTargetRow model lift.max) specs
+            List.map (createLiftTargetRow model lift.max) workout.movements
     in
     div
         [ classList
             [ ( "week", True )
-            , ( name, True )
+            , ( workout.name, True )
             , ( "hidden", not visible )
             ]
         ]

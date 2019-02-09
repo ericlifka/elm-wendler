@@ -31,6 +31,13 @@ type alias Lift =
     }
 
 
+type OpenWorkout
+    = WarmupWorkout
+    | FiveWorkout
+    | ThreeWorkout
+    | OneWorkout
+
+
 type alias Model =
     { bench : Lift
     , squat : Lift
@@ -38,10 +45,7 @@ type alias Model =
     , press : Lift
     , bar : Float
     , plates : List Float
-    , warmupVisible : Bool
-    , fiveWeekVisible : Bool
-    , threeWeekVisible : Bool
-    , oneWeekVisible : Bool
+    , openWorkout : OpenWorkout
     }
 
 
@@ -69,10 +73,7 @@ initialModel =
         }
     , bar = 45
     , plates = [ 45, 35, 25, 10, 5, 2.5 ]
-    , warmupVisible = True
-    , fiveWeekVisible = False
-    , threeWeekVisible = False
-    , oneWeekVisible = False
+    , openWorkout = WarmupWorkout
     }
 
 
@@ -140,10 +141,7 @@ type Msg
     | ToggleSquat
     | ToggleDeadlift
     | TogglePress
-    | ToggleWarmup
-    | ToggleFiveWeek
-    | ToggleThreeWeek
-    | ToggleOneWeek
+    | ToggleWorkout OpenWorkout
 
 
 update : Msg -> Model -> Model
@@ -193,37 +191,8 @@ update msg model =
                 , press = toggleSection model.press
             }
 
-        ToggleWarmup ->
-            { model
-                | warmupVisible = not model.warmupVisible
-                , fiveWeekVisible = False
-                , threeWeekVisible = False
-                , oneWeekVisible = False
-            }
-
-        ToggleFiveWeek ->
-            { model
-                | warmupVisible = False
-                , fiveWeekVisible = not model.fiveWeekVisible
-                , threeWeekVisible = False
-                , oneWeekVisible = False
-            }
-
-        ToggleThreeWeek ->
-            { model
-                | warmupVisible = False
-                , fiveWeekVisible = False
-                , threeWeekVisible = not model.threeWeekVisible
-                , oneWeekVisible = False
-            }
-
-        ToggleOneWeek ->
-            { model
-                | warmupVisible = False
-                , fiveWeekVisible = False
-                , threeWeekVisible = False
-                , oneWeekVisible = not model.oneWeekVisible
-            }
+        ToggleWorkout workout ->
+            { model | openWorkout = workout }
 
 
 updateLiftMax : Lift -> Int -> Lift
@@ -287,19 +256,19 @@ liftGroup model lift toggleVisible =
         [ button
             [ onClick toggleVisible, class "group-header header" ]
             [ text lift.name ]
-        , createLiftWorkout model lift workouts.warmup model.warmupVisible ToggleWarmup
-        , createLiftWorkout model lift workouts.five model.fiveWeekVisible ToggleFiveWeek
-        , createLiftWorkout model lift workouts.three model.threeWeekVisible ToggleThreeWeek
-        , createLiftWorkout model lift workouts.one model.oneWeekVisible ToggleOneWeek
+        , createLiftWorkout model lift workouts.warmup ToggleWorkout WarmupWorkout
+        , createLiftWorkout model lift workouts.five ToggleWorkout FiveWorkout
+        , createLiftWorkout model lift workouts.three ToggleWorkout ThreeWorkout
+        , createLiftWorkout model lift workouts.one ToggleWorkout OneWorkout
         ]
 
 
-createLiftWorkout : Model -> Lift -> Workout -> Bool -> Msg -> Html Msg
-createLiftWorkout model lift workout visible toggleMsg =
+createLiftWorkout : Model -> Lift -> Workout -> (OpenWorkout -> Msg) -> OpenWorkout -> Html Msg
+createLiftWorkout model lift workout toggleVisible sectionMsg =
     let
         buttonElement =
             button
-                [ onClick toggleMsg, class "row header" ]
+                [ onClick (toggleVisible sectionMsg), class "row header" ]
                 [ text workout.name ]
 
         rowList =
@@ -309,7 +278,7 @@ createLiftWorkout model lift workout visible toggleMsg =
         [ classList
             [ ( "week", True )
             , ( workout.name, True )
-            , ( "hidden", not visible )
+            , ( "hidden", sectionMsg /= model.openWorkout )
             ]
         ]
         (buttonElement :: rowList)

@@ -182,12 +182,12 @@ view model =
 liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
 liftMaxRow name lift addLift =
     div [ class ("row " ++ name) ]
-        [ div [ class "label" ]
+        [ button [ onClick (addLift -5) ] [ text "-5" ]
+        , div [ class "label" ]
             [ text name ]
         , div [ class "value" ]
             [ text (String.fromInt lift) ]
         , button [ onClick (addLift 5) ] [ text "+5" ]
-        , button [ onClick (addLift -5) ] [ text "-5" ]
         ]
 
 

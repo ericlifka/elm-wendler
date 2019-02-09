@@ -1,3 +1,25 @@
+body {
+  color: #224656;
+  background-color: #f0f9fd;
+  font-family: sans-serif;
+}
+
+button {
+  cursor: pointer;
+  border: 3px solid #5bc0eb;
+  color: #5bc0eb;
+  border-radius: 10px;
+  background-color: #f0f9fd;
+  font-size: 24px;
+  padding: 10px;
+  min-width: 60px;
+}
+button:active {
+  color: #f0f9fd;
+  border-color: #c3e8f7;
+  background-color: #5bc0eb;
+}
+
 .lift-maxes .row {
   display: flex;
   flex-direction: row;
@@ -15,6 +37,17 @@
 .lift-maxes .value {
   font-weight: bold;
   font-size: 28px;
+  min-width: 60px;
+  margin-right: 25px;
+}
+.lift-maxes .label {
+  min-width: 100px;
+  margin-left: 20px;
+}
+.lift-maxes .value,
+.lift-maxes .label {
+  display: flex;
+  justify-content: flex-end;
 }
 
 
@@ -29,14 +62,13 @@
   padding-left: 20px;
   display: flex; 
   flex-direction: column;
-  background-color: aliceblue;
   margin-bottom: 15px;
 }
 
 .lift-groups .header {
   margin-left: -20px;
   margin-top: 5px;
-  padding-left: 10px;
+  padding-left: 20px;
 }
 
 .lift-groups .week {
@@ -70,7 +102,8 @@
 
 .lift-groups .row.lift {
   padding: 10px 0;
-  border-bottom: 1px solid #cfcfcf;
+  margin-right: 20px;
+  border-bottom: 1px solid #b4e2f5;
 }
 
 .lift-groups .row > span {
@@ -78,7 +111,6 @@
 }
 .lift-groups .row .weight {
   font-size: 24px;
-  color: #000000;
   min-width: 90px;
 }
 .lift-groups .row .count {
@@ -87,5 +119,5 @@
 .lift-groups .row .plates {
   font-size: 20px;
   align-self: center;
-  color: #777777;
+  color: #438cab;
 }

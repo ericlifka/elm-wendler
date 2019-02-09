@@ -226,6 +226,21 @@ update msg model =
             }
 
 
+updateLiftMax : Lift -> Int -> Lift
+updateLiftMax lift value =
+    { lift | max = lift.max + value }
+
+
+hideSection : Lift -> Lift
+hideSection section =
+    { section | visible = False }
+
+
+toggleSection : Lift -> Lift
+toggleSection section =
+    { section | visible = not section.visible }
+
+
 
 -- View
 
@@ -270,9 +285,7 @@ liftGroup model lift toggleVisible =
             ]
         ]
         [ button
-            [ onClick toggleVisible
-            , class "group-header header"
-            ]
+            [ onClick toggleVisible, class "group-header header" ]
             [ text lift.name ]
         , createLiftWorkout model lift workouts.warmup model.warmupVisible ToggleWarmup
         , createLiftWorkout model lift workouts.five model.fiveWeekVisible ToggleFiveWeek
@@ -303,11 +316,8 @@ createLiftWorkout model lift workout visible toggleMsg =
 
 
 createLiftTargetRow : Model -> Int -> ( Float, String ) -> Html Msg
-createLiftTargetRow model liftMax spec =
+createLiftTargetRow model liftMax ( percent, count ) =
     let
-        ( percent, count ) =
-            spec
-
         lift : Float
         lift =
             max model.bar (roundToFive (percent * toFloat liftMax))
@@ -325,25 +335,6 @@ createLiftTargetRow model liftMax spec =
         , span [ class "count" ] [ text ("x" ++ count) ]
         , span [ class "plates" ] [ text ("[" ++ plateDisplay ++ "]") ]
         ]
-
-
-
--- Helpers
-
-
-updateLiftMax : Lift -> Int -> Lift
-updateLiftMax lift value =
-    { lift | max = lift.max + value }
-
-
-hideSection : Lift -> Lift
-hideSection section =
-    { section | visible = False }
-
-
-toggleSection : Lift -> Lift
-toggleSection section =
-    { section | visible = not section.visible }
 
 
 roundToFive : Float -> Float

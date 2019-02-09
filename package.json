@@ -6,7 +6,8 @@
     "start": "parcel app/index.html",
     "build": "parcel build app/index.html",
     "test": "elm-test",
-    "autotest": "elm-test --watch"
+    "autotest": "elm-test --watch",
+    "deploy": "rm -rf docs && mkdir docs && cp dist/* docs/"
   },
   "author": "Eric Lifka",
   "license": "MIT",

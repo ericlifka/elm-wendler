@@ -1,0 +1,123 @@
+body {
+  color: #224656;
+  background-color: #f0f9fd;
+  font-family: sans-serif;
+}
+
+button {
+  cursor: pointer;
+  border: 3px solid #5bc0eb;
+  color: #5bc0eb;
+  border-radius: 10px;
+  background-color: #f0f9fd;
+  font-size: 24px;
+  padding: 10px;
+  min-width: 60px;
+}
+button:active {
+  color: #f0f9fd;
+  border-color: #c3e8f7;
+  background-color: #5bc0eb;
+}
+
+.lift-maxes .row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  margin: 5px;
+}
+
+.lift-maxes .row > * {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.lift-maxes .value {
+  font-weight: bold;
+  font-size: 28px;
+  min-width: 60px;
+  margin-right: 25px;
+}
+.lift-maxes .label {
+  min-width: 100px;
+  margin-left: 20px;
+}
+.lift-maxes .value,
+.lift-maxes .label {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+
+.lift-groups {
+  display: flex;
+  flex-direction: column;
+  padding: 0 15px;
+}
+
+.lift-groups .group {
+  padding-left: 20px;
+  display: flex; 
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.lift-groups .header {
+  margin-left: -20px;
+  margin-top: 5px;
+  padding-left: 20px;
+}
+
+.lift-groups .week {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.lift-groups .group .week {
+  display: hidden;
+  height: 0px;
+  overflow: hidden;
+}
+.lift-groups .group.visible .week {
+  visibility: visible;
+  height: auto;
+}
+
+.lift-groups .week.hidden .lift {
+  visibility: hidden;
+  height: 0px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.lift-groups .row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.lift-groups .row.lift {
+  padding: 10px 0;
+  margin-right: 20px;
+  border-bottom: 1px solid #b4e2f5;
+}
+
+.lift-groups .row > span {
+  padding: 0 10px;
+}
+.lift-groups .row .weight {
+  font-size: 24px;
+  min-width: 90px;
+}
+.lift-groups .row .count {
+  min-width: 60px;
+}
+.lift-groups .row .plates {
+  font-size: 20px;
+  align-self: center;
+  color: #438cab;
+}

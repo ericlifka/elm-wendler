@@ -4,7 +4,7 @@
   "description": "wendler 531 program tracker in elm",
   "scripts": {
     "start": "parcel app/index.html",
-    "build": "parcel build app/index.html",
+    "build": "parcel build app/index.html --public-url ./elm-wendler/",
     "test": "elm-test",
     "autotest": "elm-test --watch",
     "deploy": "rm -rf docs && mkdir docs && cp dist/* docs/"

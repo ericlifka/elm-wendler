@@ -3,4 +3,4 @@ parcelRequire=function(e,r,n,t){var i="function"==typeof parcelRequire&&parcelRe
 },{}],"QdeU":[function(require,module,exports) {
 "use strict";var e=require("../elm/Main.elm");e.Elm.Main.init({node:document.getElementById("app")});
 },{"../elm/Main.elm":"ENeC"}]},{},["QdeU"], null)
-//# sourceMappingURL=/app.1e0abd48.map
+//# sourceMappingURL=elm-wendler/app.1e0abd48.map

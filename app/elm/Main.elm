@@ -201,7 +201,12 @@ liftGroup name model lift group =
             ]
         ]
         [ button
-            [ onClick (ToggleGroup group), class "group-header header" ]
+            [ onClick (ToggleGroup group)
+            , classList
+                [ ( "group-header header", True )
+                , ( "active", model.openGroup == group )
+                ]
+            ]
             [ text name ]
         , createLiftWorkout model lift workouts.warmup WarmupWorkout
         , createLiftWorkout model lift workouts.five FiveWorkout
@@ -215,7 +220,12 @@ createLiftWorkout model lift workout sectionMsg =
     let
         buttonElement =
             button
-                [ onClick (ToggleWorkout sectionMsg), class "row header" ]
+                [ onClick (ToggleWorkout sectionMsg)
+                , classList
+                    [ ( "row header", True )
+                    , ( "active", sectionMsg == model.openWorkout )
+                    ]
+                ]
                 [ text workout.name ]
 
         rowList =

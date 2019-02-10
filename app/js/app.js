@@ -1,5 +1,10 @@
-import { Elm } from '../elm/Main.elm'
+import { Elm } from '../elm/Main.elm';
+import { bind as bindStorage } from "./localStorage.js";
 
-Elm.Main.init({
+const app = Elm.Main.init({
   node: document.getElementById('app')
 });
+
+// LocalStorage
+
+bindStorage(app);

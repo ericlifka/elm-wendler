@@ -4,6 +4,9 @@ import Browser exposing (sandbox)
 import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (class, classList, id)
 import Html.Events exposing (onClick)
+import Json.Decode as Decode
+import Json.Encode as Encode
+import LocalStorage exposing (Event(..))
 
 
 {-| This creates the most basic sort of Elm progam available in the
@@ -63,7 +66,12 @@ init _ =
       , openGroup = None
       , openWorkout = WarmupWorkout
       }
-    , Cmd.none
+    , Cmd.batch
+        [ LocalStorage.request "bench"
+        , LocalStorage.request "squat"
+        , LocalStorage.request "deadlift"
+        , LocalStorage.request "press"
+        ]
     )
 
 
@@ -129,22 +137,23 @@ type Msg
     | AddPress Int
     | ToggleGroup OpenGroup
     | ToggleWorkout OpenWorkout
+    | StorageEvent LocalStorage.Event
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         AddBench value ->
-            ( { model | bench = model.bench + value }, Cmd.none )
+            ( model, saveLift "bench" (model.bench + value) )
 
         AddSquat value ->
-            ( { model | squat = model.squat + value }, Cmd.none )
+            ( model, saveLift "squat" (model.squat + value) )
 
         AddDeadlift value ->
-            ( { model | deadlift = model.deadlift + value }, Cmd.none )
+            ( model, saveLift "deadlift" (model.deadlift + value) )
 
         AddPress value ->
-            ( { model | press = model.press + value }, Cmd.none )
+            ( model, saveLift "press" (model.press + value) )
 
         ToggleGroup group ->
             ( { model
@@ -161,6 +170,132 @@ update msg model =
         ToggleWorkout workout ->
             ( { model | openWorkout = workout }, Cmd.none )
 
+        StorageEvent event ->
+            handleStorageEvent model event
+
+
+handleStorageEvent : Model -> LocalStorage.Event -> ( Model, Cmd Msg )
+handleStorageEvent model event =
+    case event of
+        Updated key value ->
+            storageUpdate model key value
+
+        WriteFailure key value err ->
+            storageUpdate model key value
+                |> withErrorLog
+                    ("unable to write to localStorage key '"
+                        ++ key
+                        ++ "': "
+                        ++ err
+                    )
+
+        BadMessage err ->
+            ( model, Cmd.none )
+                |> withErrorLog ("Malformed storage event: " ++ Decode.errorToString err)
+
+
+storageUpdate : Model -> String -> Maybe String -> ( Model, Cmd Msg )
+storageUpdate model key value =
+    case key of
+        "bench" ->
+            Maybe.map (updateBench model) value
+                |> Maybe.withDefault (resetBench model)
+
+        "squat" ->
+            Maybe.map (updateSquat model) value
+                |> Maybe.withDefault (resetSquat model)
+
+        "deadlift" ->
+            Maybe.map (updateDeadlift model) value
+                |> Maybe.withDefault (resetDeadlift model)
+
+        "press" ->
+            Maybe.map (updatePress model) value
+                |> Maybe.withDefault (resetPress model)
+
+        _ ->
+            ( model, Cmd.none )
+
+
+saveLift : String -> Int -> Cmd Msg
+saveLift lift value =
+    LocalStorage.save lift (String.fromInt value)
+
+
+updateBench : Model -> String -> ( Model, Cmd Msg )
+updateBench model benchStr =
+    case String.toInt benchStr of
+        Just bench ->
+            ( { model | bench = bench }, Cmd.none )
+
+        Nothing ->
+            ( model, logError ("Got invalid int value: " ++ benchStr) )
+
+
+resetBench : Model -> ( Model, Cmd Msg )
+resetBench model =
+    ( { model | bench = 65 }, Cmd.none )
+
+
+updateSquat : Model -> String -> ( Model, Cmd Msg )
+updateSquat model squatStr =
+    case String.toInt squatStr of
+        Just squat ->
+            ( { model | squat = squat }, Cmd.none )
+
+        Nothing ->
+            ( model, logError ("Got invalid int value: " ++ squatStr) )
+
+
+resetSquat : Model -> ( Model, Cmd Msg )
+resetSquat model =
+    ( { model | squat = 85 }, Cmd.none )
+
+
+updateDeadlift : Model -> String -> ( Model, Cmd Msg )
+updateDeadlift model deadliftStr =
+    case String.toInt deadliftStr of
+        Just deadlift ->
+            ( { model | deadlift = deadlift }, Cmd.none )
+
+        Nothing ->
+            ( model, logError ("Got invalid int value: " ++ deadliftStr) )
+
+
+resetDeadlift : Model -> ( Model, Cmd Msg )
+resetDeadlift model =
+    ( { model | deadlift = 135 }, Cmd.none )
+
+
+updatePress : Model -> String -> ( Model, Cmd Msg )
+updatePress model pressStr =
+    case String.toInt pressStr of
+        Just press ->
+            ( { model | press = press }, Cmd.none )
+
+        Nothing ->
+            ( model, logError ("Got invalid int value: " ++ pressStr) )
+
+
+resetPress : Model -> ( Model, Cmd Msg )
+resetPress model =
+    ( { model | press = 45 }, Cmd.none )
+
+
+withErrorLog : String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+withErrorLog err updateTuple =
+    updateTuple
+        |> Tuple.mapSecond (\cmd -> Cmd.batch [ cmd, logError err ])
+
+
+logError : String -> Cmd Msg
+logError error =
+    let
+        log =
+            Debug.log "ERROR" error
+    in
+    Cmd.none
+
 
 
 -- Subscriptions
@@ -168,7 +303,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.map StorageEvent LocalStorage.watchChanges
 
 
 

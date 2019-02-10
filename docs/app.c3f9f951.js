@@ -5474,7 +5474,7 @@ var author$project$Main$init = function (_n0) {
 			openGroup: author$project$Main$None,
 			openWorkout: author$project$Main$WarmupWorkout,
 			plates: _List_fromArray(
-				[45, 35, 25, 10, 5, 2.5]),
+				[45, 25, 10, 5, 2.5]),
 			press: 45,
 			squat: 85
 		},
@@ -5580,9 +5580,7 @@ var author$project$Main$resetSquat = function (model) {
 			{squat: 85}),
 		elm$core$Platform$Cmd$none);
 };
-var elm$core$Debug$log = _Debug_log;
 var author$project$Main$logError = function (error) {
-	var log = A2(elm$core$Debug$log, 'ERROR', error);
 	return elm$core$Platform$Cmd$none;
 };
 var elm$core$String$toInt = _String_toInt;
@@ -11057,7 +11055,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42993" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40123" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

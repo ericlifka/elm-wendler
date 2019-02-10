@@ -13,10 +13,11 @@ documentation @ <https://package.elm-lang.org/packages/elm/browser/latest/>
 -}
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = initialModel
+    Browser.element
+        { init = init
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }
 
 
@@ -51,17 +52,19 @@ type alias Model =
     }
 
 
-initialModel : Model
-initialModel =
-    { bench = 65
-    , squat = 85
-    , deadlift = 135
-    , press = 45
-    , bar = 45
-    , plates = [ 45, 35, 25, 10, 5, 2.5 ]
-    , openGroup = None
-    , openWorkout = WarmupWorkout
-    }
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( { bench = 65
+      , squat = 85
+      , deadlift = 135
+      , press = 45
+      , bar = 45
+      , plates = [ 45, 35, 25, 10, 5, 2.5 ]
+      , openGroup = None
+      , openWorkout = WarmupWorkout
+      }
+    , Cmd.none
+    )
 
 
 type alias Workout =
@@ -128,33 +131,44 @@ type Msg
     | ToggleWorkout OpenWorkout
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         AddBench value ->
-            { model | bench = model.bench + value }
+            ( { model | bench = model.bench + value }, Cmd.none )
 
         AddSquat value ->
-            { model | squat = model.squat + value }
+            ( { model | squat = model.squat + value }, Cmd.none )
 
         AddDeadlift value ->
-            { model | deadlift = model.deadlift + value }
+            ( { model | deadlift = model.deadlift + value }, Cmd.none )
 
         AddPress value ->
-            { model | press = model.press + value }
+            ( { model | press = model.press + value }, Cmd.none )
 
         ToggleGroup group ->
-            { model
+            ( { model
                 | openGroup =
                     if model.openGroup == group then
                         None
 
                     else
                         group
-            }
+              }
+            , Cmd.none
+            )
 
         ToggleWorkout workout ->
-            { model | openWorkout = workout }
+            ( { model | openWorkout = workout }, Cmd.none )
+
+
+
+-- Subscriptions
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
 
 
 

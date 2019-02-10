@@ -14,7 +14,8 @@ button {
   padding: 10px;
   min-width: 60px;
 }
-button:active {
+button:active,
+button.active {
   color: #f0f9fd;
   border-color: #c3e8f7;
   background-color: #5bc0eb;
@@ -39,15 +40,14 @@ button:active {
   font-size: 28px;
   min-width: 60px;
   margin-right: 25px;
+  display: flex;
+  justify-content: flex-end;
 }
 .lift-maxes .label {
   min-width: 100px;
   margin-left: 20px;
-}
-.lift-maxes .value,
-.lift-maxes .label {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 
@@ -69,6 +69,10 @@ button:active {
   margin-left: -20px;
   margin-top: 5px;
   padding-left: 20px;
+  font-size: 20px;
+}
+.lift-groups .group-header.header {
+  font-size: 30px;
 }
 
 .lift-groups .week {

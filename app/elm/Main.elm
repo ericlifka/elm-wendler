@@ -62,7 +62,7 @@ init _ =
       , deadlift = 135
       , press = 45
       , bar = 45
-      , plates = [ 45, 35, 25, 10, 5, 2.5 ]
+      , plates = [ 45, 25, 10, 5, 2.5 ]
       , openGroup = None
       , openWorkout = WarmupWorkout
       }

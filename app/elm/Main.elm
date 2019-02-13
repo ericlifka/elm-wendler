@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser exposing (sandbox)
-import Html exposing (Html, button, div, span, text)
-import Html.Attributes exposing (class, classList, id)
+import Html exposing (Html, button, div, node, span, text)
+import Html.Attributes exposing (attribute, class, classList, id)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -229,7 +229,8 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ class "lift-maxes" ]
+        [ node "ion-icon" [ attribute "name" "settings" ] []
+        , div [ class "lift-maxes" ]
             [ liftMaxRow "Bench" model.bench AddBench
             , liftMaxRow "Squat" model.squat AddSquat
             , liftMaxRow "Deadlift" model.deadlift AddDeadlift

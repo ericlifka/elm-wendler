@@ -7,6 +7,7 @@ import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import LocalStorage exposing (Event(..))
+import Workouts exposing (..)
 
 
 {-| This creates the most basic sort of Elm progam available in the
@@ -73,57 +74,6 @@ init _ =
         , LocalStorage.request "press"
         ]
     )
-
-
-type alias Workout =
-    { name : String
-    , movements : List ( Float, String )
-    }
-
-
-type alias Workouts =
-    { warmup : Workout
-    , five : Workout
-    , three : Workout
-    , one : Workout
-    }
-
-
-workouts : Workouts
-workouts =
-    { warmup =
-        { name = "Warmup/Deload"
-        , movements =
-            [ ( 0.4, "5" )
-            , ( 0.5, "5" )
-            , ( 0.6, "5" )
-            ]
-        }
-    , five =
-        { name = "5-5-5"
-        , movements =
-            [ ( 0.65, "5" )
-            , ( 0.75, "5" )
-            , ( 0.85, "5+" )
-            ]
-        }
-    , three =
-        { name = "3-3-3"
-        , movements =
-            [ ( 0.7, "3" )
-            , ( 0.8, "3" )
-            , ( 0.9, "3+" )
-            ]
-        }
-    , one =
-        { name = "5-3-1"
-        , movements =
-            [ ( 0.75, "5" )
-            , ( 0.85, "3" )
-            , ( 0.95, "1+" )
-            ]
-        }
-    }
 
 
 
@@ -196,25 +146,8 @@ handleStorageEvent model event =
 
 storageUpdate : Model -> String -> Maybe String -> ( Model, Cmd Msg )
 storageUpdate model key value =
-    case key of
-        "bench" ->
-            Maybe.map (updateBench model) value
-                |> Maybe.withDefault (resetBench model)
-
-        "squat" ->
-            Maybe.map (updateSquat model) value
-                |> Maybe.withDefault (resetSquat model)
-
-        "deadlift" ->
-            Maybe.map (updateDeadlift model) value
-                |> Maybe.withDefault (resetDeadlift model)
-
-        "press" ->
-            Maybe.map (updatePress model) value
-                |> Maybe.withDefault (resetPress model)
-
-        _ ->
-            ( model, Cmd.none )
+    Maybe.map (updateLift model key) value
+        |> Maybe.withDefault (resetLift model key)
 
 
 saveLift : String -> Int -> Cmd Msg
@@ -222,64 +155,47 @@ saveLift lift value =
     LocalStorage.save lift (String.fromInt value)
 
 
-updateBench : Model -> String -> ( Model, Cmd Msg )
-updateBench model benchStr =
-    case String.toInt benchStr of
-        Just bench ->
-            ( { model | bench = bench }, Cmd.none )
-
+updateLift : Model -> String -> String -> ( Model, Cmd Msg )
+updateLift model lift valStr =
+    case String.toInt valStr of
         Nothing ->
-            ( model, logError ("Got invalid int value: " ++ benchStr) )
+            ( model, logError ("Got invalid int value: (" ++ lift ++ ", " ++ valStr ++ ")") )
+
+        Just value ->
+            case lift of
+                "bench" ->
+                    ( { model | bench = value }, Cmd.none )
+
+                "squat" ->
+                    ( { model | squat = value }, Cmd.none )
+
+                "deadlift" ->
+                    ( { model | deadlift = value }, Cmd.none )
+
+                "press" ->
+                    ( { model | press = value }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
-resetBench : Model -> ( Model, Cmd Msg )
-resetBench model =
-    ( { model | bench = 65 }, Cmd.none )
+resetLift : Model -> String -> ( Model, Cmd Msg )
+resetLift model lift =
+    case lift of
+        "bench" ->
+            ( { model | bench = 65 }, Cmd.none )
 
+        "squat" ->
+            ( { model | squat = 85 }, Cmd.none )
 
-updateSquat : Model -> String -> ( Model, Cmd Msg )
-updateSquat model squatStr =
-    case String.toInt squatStr of
-        Just squat ->
-            ( { model | squat = squat }, Cmd.none )
+        "deadlift" ->
+            ( { model | deadlift = 135 }, Cmd.none )
 
-        Nothing ->
-            ( model, logError ("Got invalid int value: " ++ squatStr) )
+        "press" ->
+            ( { model | press = 45 }, Cmd.none )
 
-
-resetSquat : Model -> ( Model, Cmd Msg )
-resetSquat model =
-    ( { model | squat = 85 }, Cmd.none )
-
-
-updateDeadlift : Model -> String -> ( Model, Cmd Msg )
-updateDeadlift model deadliftStr =
-    case String.toInt deadliftStr of
-        Just deadlift ->
-            ( { model | deadlift = deadlift }, Cmd.none )
-
-        Nothing ->
-            ( model, logError ("Got invalid int value: " ++ deadliftStr) )
-
-
-resetDeadlift : Model -> ( Model, Cmd Msg )
-resetDeadlift model =
-    ( { model | deadlift = 135 }, Cmd.none )
-
-
-updatePress : Model -> String -> ( Model, Cmd Msg )
-updatePress model pressStr =
-    case String.toInt pressStr of
-        Just press ->
-            ( { model | press = press }, Cmd.none )
-
-        Nothing ->
-            ( model, logError ("Got invalid int value: " ++ pressStr) )
-
-
-resetPress : Model -> ( Model, Cmd Msg )
-resetPress model =
-    ( { model | press = 45 }, Cmd.none )
+        _ ->
+            ( model, Cmd.none )
 
 
 withErrorLog : String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )

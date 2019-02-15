@@ -244,13 +244,15 @@ view model =
         SettingsView ->
             div [ class "application" ]
                 [ settingsButton (SwitchView WorkoutView)
+                , backButton (SwitchView WorkoutView)
                 , settingsView model
                 ]
 
         WorkoutView ->
             div [ class "application" ]
                 [ settingsButton (SwitchView SettingsView)
-                , backButton
+
+                -- , backButton
                 ]
 
 
@@ -280,14 +282,14 @@ liftMaxRow lift max changeLift =
 
 
 settingsButton : Msg -> Html Msg
-settingsButton toggle =
-    button [ class "settings-button", onClick toggle ]
+settingsButton openView =
+    button [ class "settings-button", onClick openView ]
         [ ionicon "settings" ]
 
 
-backButton : Html Msg
-backButton =
-    button [ class "back-button" ]
+backButton : Msg -> Html Msg
+backButton openView =
+    button [ class "back-button", onClick openView ]
         [ ionicon "arrow-round-back" ]
 
 

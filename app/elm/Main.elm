@@ -29,6 +29,11 @@ main =
 -- Model
 
 
+type ActiveView
+    = SettingsView
+    | WorkoutView
+
+
 type OpenWorkout
     = NoWorkout
     | WarmupWorkout
@@ -52,6 +57,7 @@ type alias Model =
     , press : Int
     , bar : Float
     , plates : List Float
+    , activeView : ActiveView
     , openGroup : OpenGroup
     , openWorkout : OpenWorkout
     }
@@ -59,12 +65,13 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { bench = 65
-      , squat = 85
-      , deadlift = 135
-      , press = 45
+    ( { bench = 0
+      , squat = 0
+      , deadlift = 0
+      , press = 0
       , bar = 45
       , plates = [ 45, 25, 10, 5, 2.5 ]
+      , activeView = WorkoutView
       , openGroup = NoGroup
       , openWorkout = WarmupWorkout
       }
@@ -86,6 +93,7 @@ type Msg
     | AddSquat Int
     | AddDeadlift Int
     | AddPress Int
+    | SwitchView ActiveView
     | ToggleGroup OpenGroup
     | ToggleWorkout OpenWorkout
     | StorageEvent LocalStorage.Event
@@ -117,6 +125,9 @@ update msg model =
               }
             , Cmd.none
             )
+
+        SwitchView newActive ->
+            ( { model | activeView = newActive }, Cmd.none )
 
         ToggleWorkout workout ->
             ( { model | openWorkout = workout }, Cmd.none )
@@ -229,15 +240,48 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "application" ]
-        [ settingsButton
-        , backButton
+    case model.activeView of
+        SettingsView ->
+            div [ class "application" ]
+                [ settingsButton (SwitchView WorkoutView)
+                , settingsView model
+                ]
+
+        WorkoutView ->
+            div [ class "application" ]
+                [ settingsButton (SwitchView SettingsView)
+                , backButton
+                ]
+
+
+settingsView : Model -> Html Msg
+settingsView model =
+    div [ class "settings-view" ]
+        [ div [ class "title-bar row" ] [ text "Settings" ]
+        , liftMaxRow "Bench" model.bench AddBench
+        , liftMaxRow "Squat" model.squat AddSquat
+        , liftMaxRow "Deadlift" model.deadlift AddDeadlift
+        , liftMaxRow "Press" model.press AddPress
         ]
 
 
-settingsButton : Html Msg
-settingsButton =
-    button [ class "settings-button" ]
+{-| TODO: convert to editable input fields
+-}
+liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
+liftMaxRow lift max changeLift =
+    div [ class "row" ]
+        [ button [ onClick (changeLift -5) ] [ text "-5" ]
+        , div [ class "label" ]
+            [ text lift ]
+        , div [ class "value" ]
+            [ text (String.fromInt max) ]
+        , button [ onClick (changeLift 5) ] [ text "+5" ]
+        ]
+
+
+settingsButton : Msg -> Html Msg
+settingsButton toggle =
+    button [ class "settings-button", onClick toggle ]
         [ ionicon "settings" ]
 
 

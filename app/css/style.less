@@ -1,5 +1,7 @@
+@import "variables";
 // -- resets -- //
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   background-color: #ffffff;
@@ -14,16 +16,16 @@ button {
 
 // -- app styles -- //
 .application {
+  color: @primary-darkest;
   @import 'nav-buttons';
+  @import 'settings-view';
 }
-
 
 // body {
 //   color: #224656;
 //   background-color: #f0f9fd;
 //   font-family: sans-serif;
 // }
-
 // button {
 //   cursor: pointer;
 //   border: 3px solid #5bc0eb;
@@ -40,51 +42,15 @@ button {
 //   border-color: #c3e8f7;
 //   background-color: #5bc0eb;
 // }
-
-// .lift-maxes {
-//   .row {
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: center;
-//     align-items: center;
-//     font-size: 24px;
-//     margin: 5px;
-
-//     & > * {
-//       margin-left: 5px;
-//       margin-right: 5px;
-//     }
-//   }
-
-//   .value {
-//     font-weight: bold;
-//     font-size: 28px;
-//     min-width: 60px;
-//     margin-right: 25px;
-//     display: flex;
-//     justify-content: flex-end;
-//   }
-
-//   .label {
-//     min-width: 100px;
-//     margin-left: 20px;
-//     display: flex;
-//     justify-content: flex-start;
-//   }
-// }
-
-
 // .lift-groups {
 //   display: flex;
 //   flex-direction: column;
 //   padding: 0 15px;
-
 //   .group {
 //     padding-left: 20px;
 //     display: flex; 
 //     flex-direction: column;
 //     margin-bottom: 15px;
-
 //     .week {
 //       display: hidden;
 //       height: 0px;
@@ -98,7 +64,6 @@ button {
 //       height: auto;
 //     }
 //   }
-
 //   .header {
 //     margin-left: -20px;
 //     margin-top: 5px;
@@ -108,19 +73,16 @@ button {
 //   .group-header.header {
 //     font-size: 30px;
 //   }
-
 //   .week.hidden .lift {
 //     visibility: hidden;
 //     height: 0px;
 //     overflow: hidden;
 //     padding: 0;
 //   }
-
 //   .row {
 //     display: flex;
 //     flex-direction: row;
 //     align-items: flex-end;
-
 //     &.lift {
 //       padding: 10px 0;
 //       margin-right: 20px;
@@ -129,16 +91,13 @@ button {
 //     & > span {
 //       padding: 0 10px;
 //     }
-
 //     .weight {
 //       font-size: 24px;
 //       min-width: 90px;
 //     }
-  
 //     .count {
 //       min-width: 60px;
 //     }
-  
 //     .plates {
 //       font-size: 20px;
 //       align-self: center;

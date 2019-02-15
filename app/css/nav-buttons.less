@@ -1,42 +1,40 @@
 .nav-button(@_) {
-    box-shadow: 0 0 8px 0px #cfcece;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    width: 85px;
-    height: 85px;
-    border-radius: 100%;
-    font-size: 32px;
-    border: 3px solid #5bc0eb;
-    color: #5bc0eb;
-    bottom: -25px;
+  .button-box-shadow();
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 85px;
+  height: 85px;
+  border-radius: 100%;
+  font-size: 32px;
+  border: 3px solid @primary-medium;
+  color: @primary-medium;
+  bottom: -25px;
+  background-color: @primary-lightest;
+  ion-icon {
+    margin-top: -15px;
+  }
+}
 
-    &:active {
-        box-shadow: none;
-    }
-  
-    ion-icon {
-      margin-top: -15px;
-    }
+.nav-button(left) {
+  left: -25px;
+  ion-icon {
+    margin-right: -15px;
   }
-  .nav-button(left) {
-    left: -25px;
-    ion-icon {
-      margin-right: -15px;
-    }
-  }
-  .nav-button(right) {
-    right: -25px;
-    ion-icon {
-      margin-left: -15px;
-    }
-  }
+}
 
-  .settings-button {
-    .nav-button(right);
+.nav-button(right) {
+  right: -25px;
+  ion-icon {
+    margin-left: -15px;
   }
+}
 
-  .back-button {
-    .nav-button(left);
-  }
+.settings-button {
+  .nav-button(right);
+}
+
+.back-button {
+  .nav-button(left);
+}

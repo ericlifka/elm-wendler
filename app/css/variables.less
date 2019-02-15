@@ -1,0 +1,12 @@
+@primary-lightest: #f0f9fd;
+@primary-light: #b4e2f5;
+@primary-medium: #5bc0eb;
+@primary-darkest: #224656;
+@box-shadow: #cfcece;
+// 
+.button-box-shadow(@size: 8px) {
+  box-shadow: 0 0 @size 0px @box-shadow;
+  &:active {
+    box-shadow: none;
+  }
+}

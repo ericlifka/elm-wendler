@@ -230,13 +230,21 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "application" ]
-        [ settingsButton ]
+        [ settingsButton
+        , backButton
+        ]
 
 
 settingsButton : Html Msg
 settingsButton =
-    button [ class "settings-toggle" ]
+    button [ class "settings-button" ]
         [ ionicon "settings" ]
+
+
+backButton : Html Msg
+backButton =
+    button [ class "back-button" ]
+        [ ionicon "arrow-round-back" ]
 
 
 ionicon : String -> Html Msg

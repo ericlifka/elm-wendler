@@ -231,31 +231,72 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    case model.openView of
-        SettingsView ->
-            div [ class "application" ]
+    div [ class "application" ]
+        (case model.openView of
+            SettingsView ->
                 [ settingsButton (SwitchView WorkoutView)
                 , backButton (SwitchView WorkoutView)
                 , settingsView model
                 ]
 
-        WorkoutView ->
-            div [ class "application" ]
+            WorkoutView ->
                 [ settingsButton (SwitchView SettingsView)
-
-                -- , backButton
+                , workoutView model
                 ]
+        )
 
 
 settingsView : Model -> Html Msg
 settingsView model =
     div [ class "settings-view" ]
-        [ div [ class "title-bar row" ] [ text "Settings" ]
+        [ div [ class "title-bar" ] [ text "Settings" ]
         , liftMaxRow "Bench" model.bench AddBench
         , liftMaxRow "Squat" model.squat AddSquat
         , liftMaxRow "Deadlift" model.deadlift AddDeadlift
         , liftMaxRow "Press" model.press AddPress
         ]
+
+
+workoutView : Model -> Html Msg
+workoutView model =
+    case model.openWeek of
+        NoWeek ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text "Wendler" ]
+                , button [ onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
+                , button [ onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
+                , button [ onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
+                , button [ onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
+                ]
+
+        FiveWeek ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text "5-5-5" ]
+                , backButton (SwitchWeek NoWeek)
+                ]
+
+        ThreeWeek ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text "3-3-3" ]
+                , backButton (SwitchWeek NoWeek)
+                ]
+
+        OneWeek ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text "5-3-1" ]
+                , backButton (SwitchWeek NoWeek)
+                ]
+
+        DeloadWeek ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text "Deload" ]
+                , backButton (SwitchWeek NoWeek)
+                ]
+
+
+
+-- div [ class "workout-view" ]
+--     [ backButton (SwitchView SettingsView) ]
 
 
 {-| TODO: convert to editable input fields

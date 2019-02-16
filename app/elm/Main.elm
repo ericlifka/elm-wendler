@@ -263,16 +263,37 @@ workoutView model =
         NoWeek ->
             div [ class "workout-view" ]
                 [ div [ class "title-bar" ] [ text "Wendler" ]
-                , button [ onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
-                , button [ onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
-                , button [ onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
-                , button [ onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
+                , button [ class "row", onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
+                , button [ class "row", onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
+                , button [ class "row", onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
+                , button [ class "row", onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
                 ]
 
         FiveWeek ->
             div [ class "workout-view" ]
-                [ div [ class "title-bar" ] [ text "5-5-5" ]
-                , backButton (SwitchWeek NoWeek)
+                [ case model.openMovement of
+                    NoMovement ->
+                        div []
+                            [ div [ class "title-bar" ] [ text "5-5-5" ]
+                            , backButton (SwitchWeek NoWeek)
+                            , button [ class "row", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
+                            ]
+
+                    BenchMovement ->
+                        div []
+                            [ div [ class "title-bar" ] [ text "5-5-5 : Bench" ]
+                            , backButton (SwitchMovement NoMovement)
+                            , text "BENCH PRESS"
+                            ]
+
+                    SquatMovement ->
+                        div [] []
+
+                    DeadliftMovement ->
+                        div [] []
+
+                    PressMovement ->
+                        div [] []
                 ]
 
         ThreeWeek ->

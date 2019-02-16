@@ -29,25 +29,25 @@ main =
 -- Model
 
 
-type ActiveView
+type OpenView
     = SettingsView
     | WorkoutView
 
 
-type OpenWorkout
-    = NoWorkout
-    | WarmupWorkout
-    | FiveWorkout
-    | ThreeWorkout
-    | OneWorkout
+type OpenWeek
+    = NoWeek
+    | FiveWeek
+    | ThreeWeek
+    | OneWeek
+    | DeloadWeek
 
 
-type OpenGroup
-    = NoGroup
-    | BenchGroup
-    | SquatGroup
-    | DeadliftGroup
-    | PressGroup
+type OpenMovement
+    = NoMovement
+    | BenchMovement
+    | SquatMovement
+    | DeadliftMovement
+    | PressMovement
 
 
 type alias Model =
@@ -57,9 +57,9 @@ type alias Model =
     , press : Int
     , bar : Float
     , plates : List Float
-    , activeView : ActiveView
-    , openGroup : OpenGroup
-    , openWorkout : OpenWorkout
+    , openView : OpenView
+    , openWeek : OpenWeek
+    , openMovement : OpenMovement
     }
 
 
@@ -71,9 +71,9 @@ init _ =
       , press = 0
       , bar = 45
       , plates = [ 45, 25, 10, 5, 2.5 ]
-      , activeView = WorkoutView
-      , openGroup = NoGroup
-      , openWorkout = WarmupWorkout
+      , openView = WorkoutView
+      , openWeek = NoWeek
+      , openMovement = NoMovement
       }
     , Cmd.batch
         [ LocalStorage.request "bench"
@@ -93,9 +93,9 @@ type Msg
     | AddSquat Int
     | AddDeadlift Int
     | AddPress Int
-    | SwitchView ActiveView
-    | ToggleGroup OpenGroup
-    | ToggleWorkout OpenWorkout
+    | SwitchView OpenView
+    | SwitchWeek OpenWeek
+    | SwitchMovement OpenMovement
     | StorageEvent LocalStorage.Event
 
 
@@ -114,23 +114,14 @@ update msg model =
         AddPress value ->
             ( model, saveLift "press" (model.press + value) )
 
-        ToggleGroup group ->
-            ( { model
-                | openGroup =
-                    if model.openGroup == group then
-                        NoGroup
+        SwitchView newView ->
+            ( { model | openView = newView }, Cmd.none )
 
-                    else
-                        group
-              }
-            , Cmd.none
-            )
+        SwitchWeek week ->
+            ( { model | openWeek = week }, Cmd.none )
 
-        SwitchView newActive ->
-            ( { model | activeView = newActive }, Cmd.none )
-
-        ToggleWorkout workout ->
-            ( { model | openWorkout = workout }, Cmd.none )
+        SwitchMovement movement ->
+            ( { model | openMovement = movement }, Cmd.none )
 
         StorageEvent event ->
             handleStorageEvent model event
@@ -240,7 +231,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    case model.activeView of
+    case model.openView of
         SettingsView ->
             div [ class "application" ]
                 [ settingsButton (SwitchView WorkoutView)

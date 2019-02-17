@@ -1,6 +1,10 @@
 .workout-view {
   display: flex;
   flex-direction: column;
+  .sub-workout-view {
+    display: flex;
+    flex-direction: column;
+  }
   .title-bar {
     .title-bar();
     display: flex;
@@ -13,5 +17,11 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    font-size: 24px;
+    padding: 10px 0 0 20px;
+    border: none;
+    color: @primary-medium;
+    border-bottom: 3px solid @primary-light;
+    margin-bottom: 15px;
   }
 }

@@ -273,27 +273,42 @@ workoutView model =
             div [ class "workout-view" ]
                 [ case model.openMovement of
                     NoMovement ->
-                        div []
+                        div [ class "sub-workout-view" ]
                             [ div [ class "title-bar" ] [ text "5-5-5" ]
                             , backButton (SwitchWeek NoWeek)
                             , button [ class "row", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
+                            , button [ class "row", onClick (SwitchMovement SquatMovement) ] [ text "Squat" ]
+                            , button [ class "row", onClick (SwitchMovement DeadliftMovement) ] [ text "Deadlift" ]
+                            , button [ class "row", onClick (SwitchMovement PressMovement) ] [ text "Press" ]
                             ]
 
                     BenchMovement ->
-                        div []
-                            [ div [ class "title-bar" ] [ text "5-5-5 : Bench" ]
+                        div [ class "sub-workout-view" ]
+                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
                             , backButton (SwitchMovement NoMovement)
                             , text "BENCH PRESS"
                             ]
 
                     SquatMovement ->
-                        div [] []
+                        div [ class "sub-workout-view" ]
+                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
+                            , backButton (SwitchMovement NoMovement)
+                            , text "SQUAT PRESS"
+                            ]
 
                     DeadliftMovement ->
-                        div [] []
+                        div [ class "sub-workout-view" ]
+                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
+                            , backButton (SwitchMovement NoMovement)
+                            , text "DEADLIFT PRESS"
+                            ]
 
                     PressMovement ->
-                        div [] []
+                        div [ class "sub-workout-view" ]
+                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
+                            , backButton (SwitchMovement NoMovement)
+                            , text "PRESS PRESS"
+                            ]
                 ]
 
         ThreeWeek ->

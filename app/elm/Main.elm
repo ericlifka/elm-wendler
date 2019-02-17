@@ -241,7 +241,7 @@ view model =
 
             WorkoutView ->
                 [ settingsButton (SwitchView SettingsView)
-                , workoutView model
+                , workoutTopMenuView model
                 ]
         )
 
@@ -257,8 +257,8 @@ settingsView model =
         ]
 
 
-workoutView : Model -> Html Msg
-workoutView model =
+workoutTopMenuView : Model -> Html Msg
+workoutTopMenuView model =
     case model.openWeek of
         NoWeek ->
             div [ class "workout-view" ]
@@ -270,64 +270,66 @@ workoutView model =
                 ]
 
         FiveWeek ->
-            div [ class "workout-view" ]
-                [ case model.openMovement of
-                    NoMovement ->
-                        div [ class "sub-workout-view" ]
-                            [ div [ class "title-bar" ] [ text "5-5-5" ]
-                            , backButton (SwitchWeek NoWeek)
-                            , button [ class "row", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
-                            , button [ class "row", onClick (SwitchMovement SquatMovement) ] [ text "Squat" ]
-                            , button [ class "row", onClick (SwitchMovement DeadliftMovement) ] [ text "Deadlift" ]
-                            , button [ class "row", onClick (SwitchMovement PressMovement) ] [ text "Press" ]
-                            ]
-
-                    BenchMovement ->
-                        div [ class "sub-workout-view" ]
-                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
-                            , backButton (SwitchMovement NoMovement)
-                            , text "BENCH PRESS"
-                            ]
-
-                    SquatMovement ->
-                        div [ class "sub-workout-view" ]
-                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
-                            , backButton (SwitchMovement NoMovement)
-                            , text "SQUAT PRESS"
-                            ]
-
-                    DeadliftMovement ->
-                        div [ class "sub-workout-view" ]
-                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
-                            , backButton (SwitchMovement NoMovement)
-                            , text "DEADLIFT PRESS"
-                            ]
-
-                    PressMovement ->
-                        div [ class "sub-workout-view" ]
-                            [ div [ class "title-bar" ] [ text "5-5-5 Bench" ]
-                            , backButton (SwitchMovement NoMovement)
-                            , text "PRESS PRESS"
-                            ]
-                ]
+            workoutSubMenuView model workouts.five
 
         ThreeWeek ->
-            div [ class "workout-view" ]
-                [ div [ class "title-bar" ] [ text "3-3-3" ]
-                , backButton (SwitchWeek NoWeek)
-                ]
+            workoutSubMenuView model workouts.three
 
         OneWeek ->
-            div [ class "workout-view" ]
-                [ div [ class "title-bar" ] [ text "5-3-1" ]
-                , backButton (SwitchWeek NoWeek)
-                ]
+            workoutSubMenuView model workouts.one
 
         DeloadWeek ->
+            workoutSubMenuView model workouts.deload
+
+
+workoutSubMenuView : Model -> Workout -> Html Msg
+workoutSubMenuView model workout =
+    case model.openMovement of
+        NoMovement ->
             div [ class "workout-view" ]
-                [ div [ class "title-bar" ] [ text "Deload" ]
+                [ div [ class "title-bar" ] [ text workout.name ]
                 , backButton (SwitchWeek NoWeek)
+                , button [ class "row", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
+                , button [ class "row", onClick (SwitchMovement SquatMovement) ] [ text "Squat" ]
+                , button [ class "row", onClick (SwitchMovement DeadliftMovement) ] [ text "Deadlift" ]
+                , button [ class "row", onClick (SwitchMovement PressMovement) ] [ text "Press" ]
                 ]
+
+        BenchMovement ->
+            workoutView "Bench" model.bench workout
+
+        SquatMovement ->
+            workoutView "Squat" model.squat workout
+
+        DeadliftMovement ->
+            workoutView "Deadlift" model.deadlift workout
+
+        PressMovement ->
+            workoutView "Press" model.press workout
+
+
+workoutView : String -> Int -> Workout -> Html Msg
+workoutView movement max workout =
+    let
+        header =
+            [ div [ class "title-bar" ] [ text (movement ++ " " ++ workout.name) ]
+            , backButton (SwitchMovement NoMovement)
+            ]
+    in
+    div [ class "workout-view" ]
+        (if workout == workouts.deload then
+            header ++ workoutRows "Workout" max workout
+
+         else
+            header
+                ++ workoutRows "Warmup" max workouts.warmup
+                ++ workoutRows "Workout" max workout
+        )
+
+
+workoutRows : String -> Int -> Workout -> List (Html Msg)
+workoutRows title max workout =
+    [ div [] [ text title ] ]
 
 
 

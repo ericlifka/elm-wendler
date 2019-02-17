@@ -12,17 +12,18 @@ type alias Workouts =
     , five : Workout
     , three : Workout
     , one : Workout
+    , deload : Workout
     }
 
 
 workouts : Workouts
 workouts =
     { warmup =
-        { name = "Warmup/Deload"
+        { name = "Warmup"
         , movements =
             [ ( 0.4, "5" )
             , ( 0.5, "5" )
-            , ( 0.6, "5" )
+            , ( 0.6, "3" )
             ]
         }
     , five =
@@ -47,6 +48,14 @@ workouts =
             [ ( 0.75, "5" )
             , ( 0.85, "3" )
             , ( 0.95, "1+" )
+            ]
+        }
+    , deload =
+        { name = "Deload"
+        , movements =
+            [ ( 0.4, "5" )
+            , ( 0.5, "5" )
+            , ( 0.6, "5" )
             ]
         }
     }

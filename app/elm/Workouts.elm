@@ -64,8 +64,15 @@ workouts =
     }
 
 
-applyWorkout : Workout -> Int -> List Float
-applyWorkout workout max =
+applyWorkout : Workout -> Int -> Float -> List Float
+applyWorkout workout max min =
     workout.movements
         |> map first
         |> List.map ((*) (toFloat max))
+        |> map (Basics.max min)
+        |> map roundToFive
+
+
+roundToFive : Float -> Float
+roundToFive weight =
+    toFloat (5 * floor (weight / 5))

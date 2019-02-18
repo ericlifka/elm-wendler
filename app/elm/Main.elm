@@ -6,7 +6,7 @@ import Html.Attributes exposing (attribute, class, classList, id)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Encode as Encode
-import List exposing (map)
+import List exposing (map, map3)
 import LocalStorage exposing (Event(..))
 import Tuple exposing (second)
 import Workouts exposing (..)
@@ -334,10 +334,7 @@ workoutRows model title max workout =
     let
         lifts : List Float
         lifts =
-            max
-                |> applyWorkout workout
-                |> map (Basics.max 45)
-                |> map roundToFive
+            applyWorkout workout max model.bar
 
         counts : List String
         counts =
@@ -345,44 +342,41 @@ workoutRows model title max workout =
 
         platesList : List String
         platesList =
-            lifts
-                |> map (\lift -> lift - model.bar)
-                |> map (calcPlates model.plates)
-                |> map
-                    (\plates ->
-                        plates
-                            |> map String.fromFloat
-                            |> String.join ", "
-                    )
+            calculatePlates model.bar model.plates lifts
 
-        rowData : List ( Float, String, String )
-        rowData =
-            List.map3 triple lifts counts platesList
-
-        rows : List (Html Msg)
+        rows : List ( Float, String, String )
         rows =
-            rowData
-                |> map
-                    (\( lift, count, plates ) ->
-                        div [ class "row lift" ]
-                            [ span [ class "weight" ] [ text (String.fromFloat lift ++ " lbs") ]
-                            , span [ class "count" ] [ text ("x" ++ count) ]
-                            , span [ class "plates" ] [ text ("[ " ++ plates ++ " ]") ]
-                            ]
-                    )
+            map3 triple lifts counts platesList
     in
     div [ class "row title" ] [ text title ]
-        :: rows
+        :: map createWorkoutRow rows
+
+
+createWorkoutRow : ( Float, String, String ) -> Html Msg
+createWorkoutRow ( lift, count, plates ) =
+    div [ class "row lift" ]
+        [ span [ class "weight" ] [ text (String.fromFloat lift ++ " lbs") ]
+        , span [ class "count" ] [ text ("x" ++ count) ]
+        , span [ class "plates" ] [ text ("[" ++ plates ++ "]") ]
+        ]
+
+
+calculatePlates : Float -> List Float -> List Float -> List String
+calculatePlates bar platesSpec lifts =
+    lifts
+        |> map (\lift -> lift - bar)
+        |> map (calcPlates platesSpec)
+        |> map
+            (\plates ->
+                plates
+                    |> map String.fromFloat
+                    |> String.join ", "
+            )
 
 
 triple : a -> b -> c -> ( a, b, c )
 triple a b c =
     ( a, b, c )
-
-
-roundToFive : Float -> Float
-roundToFive weight =
-    toFloat (5 * floor (weight / 5))
 
 
 calcPlates : List Float -> Float -> List Float

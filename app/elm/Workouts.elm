@@ -1,4 +1,7 @@
-module Workouts exposing (Workout, Workouts, workouts)
+module Workouts exposing (Workout, Workouts, applyWorkout, workouts)
+
+import List exposing (map)
+import Tuple exposing (first)
 
 
 type alias Workout =
@@ -59,3 +62,10 @@ workouts =
             ]
         }
     }
+
+
+applyWorkout : Workout -> Int -> List Float
+applyWorkout workout max =
+    workout.movements
+        |> map first
+        |> List.map ((*) (toFloat max))

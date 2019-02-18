@@ -6,7 +6,9 @@ import Html.Attributes exposing (attribute, class, classList, id)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import List exposing (map)
 import LocalStorage exposing (Event(..))
+import Tuple exposing (second)
 import Workouts exposing (..)
 
 
@@ -296,20 +298,20 @@ workoutSubMenuView model workout =
                 ]
 
         BenchMovement ->
-            workoutView "Bench" model.bench workout
+            workoutView model "Bench" model.bench workout
 
         SquatMovement ->
-            workoutView "Squat" model.squat workout
+            workoutView model "Squat" model.squat workout
 
         DeadliftMovement ->
-            workoutView "Deadlift" model.deadlift workout
+            workoutView model "Deadlift" model.deadlift workout
 
         PressMovement ->
-            workoutView "Press" model.press workout
+            workoutView model "Press" model.press workout
 
 
-workoutView : String -> Int -> Workout -> Html Msg
-workoutView movement max workout =
+workoutView : Model -> String -> Int -> Workout -> Html Msg
+workoutView model movement max workout =
     let
         header =
             [ div [ class "title-bar" ] [ text (movement ++ " " ++ workout.name) ]
@@ -318,23 +320,85 @@ workoutView movement max workout =
     in
     div [ class "workout-view" ]
         (if workout == workouts.deload then
-            header ++ workoutRows "Workout" max workout
+            header ++ workoutRows model "Workout" max workout
 
          else
             header
-                ++ workoutRows "Warmup" max workouts.warmup
-                ++ workoutRows "Workout" max workout
+                ++ workoutRows model "Warmup" max workouts.warmup
+                ++ workoutRows model "Workout" max workout
         )
 
 
-workoutRows : String -> Int -> Workout -> List (Html Msg)
-workoutRows title max workout =
-    [ div [] [ text title ] ]
+workoutRows : Model -> String -> Int -> Workout -> List (Html Msg)
+workoutRows model title max workout =
+    let
+        lifts : List Float
+        lifts =
+            max
+                |> applyWorkout workout
+                |> map roundToFive
+
+        counts : List String
+        counts =
+            map second workout.movements
+
+        platesList : List String
+        platesList =
+            lifts
+                |> map (\lift -> lift - model.bar)
+                |> map (calcPlates model.plates)
+                |> map
+                    (\plates ->
+                        plates
+                            |> map String.fromFloat
+                            |> String.join ", "
+                    )
+
+        rowData : List ( Float, String, String )
+        rowData =
+            List.map3 triple lifts counts platesList
+
+        rows : List (Html Msg)
+        rows =
+            rowData
+                |> map
+                    (\( lift, count, plates ) ->
+                        div [ class "row lift" ]
+                            [ span [ class "weight" ] [ text (String.fromFloat lift ++ " lbs") ]
+                            , span [ class "count" ] [ text ("x" ++ count) ]
+                            , span [ class "plates" ] [ text ("[ " ++ plates ++ " ]") ]
+                            ]
+                    )
+    in
+    div [ class "row title" ] [ text title ]
+        :: rows
 
 
+triple : a -> b -> c -> ( a, b, c )
+triple a b c =
+    ( a, b, c )
 
--- div [ class "workout-view" ]
---     [ backButton (SwitchView SettingsView) ]
+
+roundToFive : Float -> Float
+roundToFive weight =
+    toFloat (5 * floor (weight / 5))
+
+
+calcPlates : List Float -> Float -> List Float
+calcPlates plates remaining =
+    case plates of
+        [] ->
+            []
+
+        largest :: rest ->
+            if remaining <= 0 then
+                []
+
+            else if (2 * largest) > remaining then
+                calcPlates rest remaining
+
+            else
+                largest :: calcPlates plates (remaining - (2 * largest))
 
 
 {-| TODO: convert to editable input fields
@@ -459,18 +523,3 @@ ionicon icon =
 --         , span [ class "count" ] [ text ("x" ++ count) ]
 --         , span [ class "plates" ] [ text ("[" ++ plateDisplay ++ "]") ]
 --         ]
--- roundToFive : Float -> Float
--- roundToFive weight =
---     toFloat (5 * floor (weight / 5))
--- calcPlates : Float -> List Float -> List Float
--- calcPlates remaining plates =
---     case plates of
---         [] ->
---             []
---         largest :: rest ->
---             if remaining <= 0 then
---                 []
---             else if (2 * largest) > remaining then
---                 calcPlates remaining rest
---             else
---                 largest :: calcPlates (remaining - (2 * largest)) plates

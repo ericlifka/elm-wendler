@@ -336,6 +336,7 @@ workoutRows model title max workout =
         lifts =
             max
                 |> applyWorkout workout
+                |> map (Basics.max 45)
                 |> map roundToFive
 
         counts : List String

@@ -265,9 +265,9 @@ workoutTopMenuView model =
         NoWeek ->
             div [ class "workout-view" ]
                 [ div [ class "title-bar" ] [ text "Wendler" ]
-                , button [ class "row button", onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
-                , button [ class "row button", onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
-                , button [ class "row button", onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
+                , button [ class "row button", onClick (SwitchWeek FiveWeek) ] [ text "5-5-5" ]
+                , button [ class "row button", onClick (SwitchWeek ThreeWeek) ] [ text "3-3-3" ]
+                , button [ class "row button", onClick (SwitchWeek OneWeek) ] [ text "5-3-1" ]
                 , button [ class "row button", onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
                 ]
 

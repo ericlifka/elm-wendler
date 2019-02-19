@@ -1,39 +1,49 @@
-.nav-button(@_) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.nav-button-wrapper(@_) {
   position: absolute;
-  width: 85px;
-  height: 85px;
-  border-radius: 100%;
-  font-size: 32px;
-  border: 3px solid @primary-medium;
-  color: @primary-medium;
-  top: -25px;
-  background-color: @primary-lightest;
-  ion-icon {
-    margin-bottom: -15px;
+  top: 0px;
+  overflow: hidden;
+  .nav-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 85px;
+    height: 85px;
+    border-radius: 100%;
+    font-size: 32px;
+    border: 3px solid @primary-medium;
+    color: @primary-medium;
+    margin-top: -25px;
+    background-color: @primary-lightest;
+    ion-icon {
+      margin-bottom: -15px;
+    }
   }
 }
 
-.nav-button(left) {
-  left: -25px;
-  ion-icon {
-    margin-right: -15px;
+.nav-button-wrapper(left) {
+  left: 0px;
+  .nav-button {
+    margin-left: -25px;
+    ion-icon {
+      margin-right: -15px;
+    }
   }
 }
 
-.nav-button(right) {
-  right: -25px;
-  ion-icon {
-    margin-left: -15px;
+.nav-button-wrapper(right) {
+  right: 0px;
+  .nav-button {
+    margin-right: -25px;
+    ion-icon {
+      margin-left: -15px;
+    }
   }
 }
 
-.settings-button {
-  .nav-button(right);
+.settings-button-wrapper {
+  .nav-button-wrapper(right);
 }
 
-.back-button {
-  .nav-button(left);
+.back-button-wrapper {
+  .nav-button-wrapper(left);
 }

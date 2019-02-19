@@ -421,14 +421,18 @@ liftMaxRow lift max changeLift =
 
 settingsButton : Msg -> Html Msg
 settingsButton openView =
-    button [ class "settings-button", onClick openView ]
-        [ ionicon "settings" ]
+    div [ class "settings-button-wrapper" ]
+        [ button [ class "nav-button", onClick openView ]
+            [ ionicon "settings" ]
+        ]
 
 
 backButton : Msg -> Html Msg
 backButton openView =
-    button [ class "back-button", onClick openView ]
-        [ ionicon "arrow-round-back" ]
+    div [ class "back-button-wrapper" ]
+        [ button [ class "nav-button", onClick openView ]
+            [ ionicon "arrow-round-back" ]
+        ]
 
 
 ionicon : String -> Html Msg

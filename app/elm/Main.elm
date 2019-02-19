@@ -265,10 +265,10 @@ workoutTopMenuView model =
         NoWeek ->
             div [ class "workout-view" ]
                 [ div [ class "title-bar" ] [ text "Wendler" ]
-                , button [ class "row", onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
-                , button [ class "row", onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
-                , button [ class "row", onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
-                , button [ class "row", onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
+                , button [ class "row button", onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
+                , button [ class "row button", onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
+                , button [ class "row button", onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
+                , button [ class "row button", onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
                 ]
 
         FiveWeek ->
@@ -291,10 +291,10 @@ workoutSubMenuView model workout =
             div [ class "workout-view" ]
                 [ div [ class "title-bar" ] [ text workout.name ]
                 , backButton (SwitchWeek NoWeek)
-                , button [ class "row", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
-                , button [ class "row", onClick (SwitchMovement SquatMovement) ] [ text "Squat" ]
-                , button [ class "row", onClick (SwitchMovement DeadliftMovement) ] [ text "Deadlift" ]
-                , button [ class "row", onClick (SwitchMovement PressMovement) ] [ text "Press" ]
+                , button [ class "row button", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
+                , button [ class "row button", onClick (SwitchMovement SquatMovement) ] [ text "Squat" ]
+                , button [ class "row button", onClick (SwitchMovement DeadliftMovement) ] [ text "Deadlift" ]
+                , button [ class "row button", onClick (SwitchMovement PressMovement) ] [ text "Press" ]
                 ]
 
         BenchMovement ->
@@ -317,19 +317,25 @@ workoutView model movement max workout =
             [ div [ class "title-bar" ] [ text (movement ++ " " ++ workout.name) ]
             , backButton (SwitchMovement NoMovement)
             ]
+
+        warmupSection =
+            workoutRows model "Warmup" max workouts.warmup
+
+        workoutSection =
+            workoutRows model "Workout" max workout
     in
     div [ class "workout-view" ]
-        (if workout == workouts.deload then
-            header ++ workoutRows model "Workout" max workout
+        (header
+            ++ (if workout == workouts.deload then
+                    [ workoutSection ]
 
-         else
-            header
-                ++ workoutRows model "Warmup" max workouts.warmup
-                ++ workoutRows model "Workout" max workout
+                else
+                    [ warmupSection, workoutSection ]
+               )
         )
 
 
-workoutRows : Model -> String -> Int -> Workout -> List (Html Msg)
+workoutRows : Model -> String -> Int -> Workout -> Html Msg
 workoutRows model title max workout =
     let
         lifts : List Float
@@ -348,16 +354,19 @@ workoutRows model title max workout =
         rows =
             map3 triple lifts counts platesList
     in
-    div [ class "row title" ] [ text title ]
-        :: map createWorkoutRow rows
+    div [ class "section" ]
+        (div [ class "row title" ] [ text title ]
+            :: map createWorkoutRow rows
+        )
 
 
 createWorkoutRow : ( Float, String, String ) -> Html Msg
 createWorkoutRow ( lift, count, plates ) =
     div [ class "row lift" ]
-        [ span [ class "weight" ] [ text (String.fromFloat lift ++ " lbs") ]
+        [ span [ class "weight" ] [ text (String.fromFloat lift) ]
+        , span [ class "label" ] [ text "lbs" ]
         , span [ class "count" ] [ text ("x" ++ count) ]
-        , span [ class "plates" ] [ text ("[" ++ plates ++ "]") ]
+        , span [ class "plates" ] [ text ("[ " ++ plates ++ " ]") ]
         ]
 
 

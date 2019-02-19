@@ -319,10 +319,10 @@ workoutView model movement max workout =
             ]
 
         warmupSection =
-            workoutRows model "Warmup" max workouts.warmup
+            workoutSectionView model "Warmup" max workouts.warmup
 
         workoutSection =
-            workoutRows model "Workout" max workout
+            workoutSectionView model "Workout" max workout
     in
     div [ class "workout-view" ]
         (header
@@ -335,8 +335,8 @@ workoutView model movement max workout =
         )
 
 
-workoutRows : Model -> String -> Int -> Workout -> Html Msg
-workoutRows model title max workout =
+workoutSectionView : Model -> String -> Int -> Workout -> Html Msg
+workoutSectionView model title max workout =
     let
         lifts : List Float
         lifts =
@@ -348,7 +348,7 @@ workoutRows model title max workout =
 
         platesList : List String
         platesList =
-            calculatePlates model.bar model.plates lifts
+            platesDisplay model.bar model.plates lifts
 
         rows : List ( Float, String, String )
         rows =
@@ -370,8 +370,8 @@ createWorkoutRow ( lift, count, plates ) =
         ]
 
 
-calculatePlates : Float -> List Float -> List Float -> List String
-calculatePlates bar platesSpec lifts =
+platesDisplay : Float -> List Float -> List Float -> List String
+platesDisplay bar platesSpec lifts =
     lifts
         |> map (\lift -> lift - bar)
         |> map (calcPlates platesSpec)

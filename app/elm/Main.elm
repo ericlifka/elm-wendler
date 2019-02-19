@@ -6,7 +6,9 @@ import Html.Attributes exposing (attribute, class, classList, id)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import List exposing (map, map3)
 import LocalStorage exposing (Event(..))
+import Tuple exposing (second)
 import Workouts exposing (..)
 
 
@@ -29,19 +31,25 @@ main =
 -- Model
 
 
-type OpenWorkout
-    = WarmupWorkout
-    | FiveWorkout
-    | ThreeWorkout
-    | OneWorkout
+type OpenView
+    = SettingsView
+    | WorkoutView
 
 
-type OpenGroup
-    = None
-    | BenchGroup
-    | SquatGroup
-    | DeadliftGroup
-    | PressGroup
+type OpenWeek
+    = NoWeek
+    | FiveWeek
+    | ThreeWeek
+    | OneWeek
+    | DeloadWeek
+
+
+type OpenMovement
+    = NoMovement
+    | BenchMovement
+    | SquatMovement
+    | DeadliftMovement
+    | PressMovement
 
 
 type alias Model =
@@ -51,21 +59,23 @@ type alias Model =
     , press : Int
     , bar : Float
     , plates : List Float
-    , openGroup : OpenGroup
-    , openWorkout : OpenWorkout
+    , openView : OpenView
+    , openWeek : OpenWeek
+    , openMovement : OpenMovement
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { bench = 65
-      , squat = 85
-      , deadlift = 135
-      , press = 45
+    ( { bench = 0
+      , squat = 0
+      , deadlift = 0
+      , press = 0
       , bar = 45
       , plates = [ 45, 25, 10, 5, 2.5 ]
-      , openGroup = None
-      , openWorkout = WarmupWorkout
+      , openView = WorkoutView
+      , openWeek = NoWeek
+      , openMovement = NoMovement
       }
     , Cmd.batch
         [ LocalStorage.request "bench"
@@ -85,8 +95,9 @@ type Msg
     | AddSquat Int
     | AddDeadlift Int
     | AddPress Int
-    | ToggleGroup OpenGroup
-    | ToggleWorkout OpenWorkout
+    | SwitchView OpenView
+    | SwitchWeek OpenWeek
+    | SwitchMovement OpenMovement
     | StorageEvent LocalStorage.Event
 
 
@@ -105,20 +116,14 @@ update msg model =
         AddPress value ->
             ( model, saveLift "press" (model.press + value) )
 
-        ToggleGroup group ->
-            ( { model
-                | openGroup =
-                    if model.openGroup == group then
-                        None
+        SwitchView newView ->
+            ( { model | openView = newView }, Cmd.none )
 
-                    else
-                        group
-              }
-            , Cmd.none
-            )
+        SwitchWeek week ->
+            ( { model | openWeek = week }, Cmd.none )
 
-        ToggleWorkout workout ->
-            ( { model | openWorkout = workout }, Cmd.none )
+        SwitchMovement movement ->
+            ( { model | openMovement = movement }, Cmd.none )
 
         StorageEvent event ->
             handleStorageEvent model event
@@ -228,114 +233,163 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ node "ion-icon" [ attribute "name" "settings" ] []
-        , div [ class "lift-maxes" ]
-            [ liftMaxRow "Bench" model.bench AddBench
-            , liftMaxRow "Squat" model.squat AddSquat
-            , liftMaxRow "Deadlift" model.deadlift AddDeadlift
-            , liftMaxRow "Press" model.press AddPress
-            ]
-        , div [ class "lift-groups" ]
-            [ liftGroup "Bench" model model.bench BenchGroup
-            , liftGroup "Squat" model model.squat SquatGroup
-            , liftGroup "Deadlift" model model.deadlift DeadliftGroup
-            , liftGroup "Press" model model.press PressGroup
-            ]
-        ]
-
-
-liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
-liftMaxRow name lift addLift =
-    div [ class ("row " ++ name) ]
-        [ button [ onClick (addLift -5) ] [ text "-5" ]
-        , div [ class "label" ]
-            [ text name ]
-        , div [ class "value" ]
-            [ text (String.fromInt lift) ]
-        , button [ onClick (addLift 5) ] [ text "+5" ]
-        ]
-
-
-liftGroup : String -> Model -> Int -> OpenGroup -> Html Msg
-liftGroup name model lift group =
-    div
-        [ classList
-            [ ( "group", True )
-            , ( name, True )
-            , ( "visible", model.openGroup == group )
-            ]
-        ]
-        [ button
-            [ onClick (ToggleGroup group)
-            , classList
-                [ ( "group-header header", True )
-                , ( "active", model.openGroup == group )
+    div [ class "application" ]
+        (case model.openView of
+            SettingsView ->
+                [ settingsButton (SwitchView WorkoutView)
+                , backButton (SwitchView WorkoutView)
+                , settingsView model
                 ]
-            ]
-            [ text name ]
-        , createLiftWorkout model lift workouts.warmup WarmupWorkout
-        , createLiftWorkout model lift workouts.five FiveWorkout
-        , createLiftWorkout model lift workouts.three ThreeWorkout
-        , createLiftWorkout model lift workouts.one OneWorkout
-        ]
 
-
-createLiftWorkout : Model -> Int -> Workout -> OpenWorkout -> Html Msg
-createLiftWorkout model lift workout sectionMsg =
-    let
-        buttonElement =
-            button
-                [ onClick (ToggleWorkout sectionMsg)
-                , classList
-                    [ ( "row header", True )
-                    , ( "active", sectionMsg == model.openWorkout )
-                    ]
+            WorkoutView ->
+                [ settingsButton (SwitchView SettingsView)
+                , workoutTopMenuView model
                 ]
-                [ text workout.name ]
+        )
 
-        rowList =
-            List.map (createLiftTargetRow model lift) workout.movements
-    in
-    div
-        [ classList
-            [ ( "week", True )
-            , ( workout.name, True )
-            , ( "hidden", sectionMsg /= model.openWorkout )
-            ]
+
+settingsView : Model -> Html Msg
+settingsView model =
+    div [ class "settings-view" ]
+        [ div [ class "title-bar" ] [ text "Settings" ]
+        , liftMaxRow "Bench" model.bench AddBench
+        , liftMaxRow "Squat" model.squat AddSquat
+        , liftMaxRow "Deadlift" model.deadlift AddDeadlift
+        , liftMaxRow "Press" model.press AddPress
         ]
-        (buttonElement :: rowList)
 
 
-createLiftTargetRow : Model -> Int -> ( Float, String ) -> Html Msg
-createLiftTargetRow model liftMax ( percent, count ) =
+workoutTopMenuView : Model -> Html Msg
+workoutTopMenuView model =
+    case model.openWeek of
+        NoWeek ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text "Wendler" ]
+                , button [ class "row button", onClick (SwitchWeek FiveWeek) ] [ text "5/5/5" ]
+                , button [ class "row button", onClick (SwitchWeek ThreeWeek) ] [ text "3/3/3" ]
+                , button [ class "row button", onClick (SwitchWeek OneWeek) ] [ text "5/3/1" ]
+                , button [ class "row button", onClick (SwitchWeek DeloadWeek) ] [ text "Deload" ]
+                ]
+
+        FiveWeek ->
+            workoutSubMenuView model workouts.five
+
+        ThreeWeek ->
+            workoutSubMenuView model workouts.three
+
+        OneWeek ->
+            workoutSubMenuView model workouts.one
+
+        DeloadWeek ->
+            workoutSubMenuView model workouts.deload
+
+
+workoutSubMenuView : Model -> Workout -> Html Msg
+workoutSubMenuView model workout =
+    case model.openMovement of
+        NoMovement ->
+            div [ class "workout-view" ]
+                [ div [ class "title-bar" ] [ text workout.name ]
+                , backButton (SwitchWeek NoWeek)
+                , button [ class "row button", onClick (SwitchMovement BenchMovement) ] [ text "Bench" ]
+                , button [ class "row button", onClick (SwitchMovement SquatMovement) ] [ text "Squat" ]
+                , button [ class "row button", onClick (SwitchMovement DeadliftMovement) ] [ text "Deadlift" ]
+                , button [ class "row button", onClick (SwitchMovement PressMovement) ] [ text "Press" ]
+                ]
+
+        BenchMovement ->
+            workoutView model "Bench" model.bench workout
+
+        SquatMovement ->
+            workoutView model "Squat" model.squat workout
+
+        DeadliftMovement ->
+            workoutView model "Deadlift" model.deadlift workout
+
+        PressMovement ->
+            workoutView model "Press" model.press workout
+
+
+workoutView : Model -> String -> Int -> Workout -> Html Msg
+workoutView model movement max workout =
     let
-        lift : Float
-        lift =
-            max model.bar (roundToFive (percent * toFloat liftMax))
+        header =
+            [ div [ class "title-bar" ] [ text (movement ++ " " ++ workout.name) ]
+            , backButton (SwitchMovement NoMovement)
+            ]
 
-        plates : List Float
-        plates =
-            calcPlates (lift - model.bar) model.plates
+        warmupSection =
+            workoutSectionView model "Warmup" max workouts.warmup
 
-        plateDisplay : String
-        plateDisplay =
-            String.join ", " (List.map String.fromFloat plates)
+        workoutSection =
+            workoutSectionView model "Workout" max workout
     in
+    div [ class "workout-view" ]
+        (header
+            ++ (if workout == workouts.deload then
+                    [ workoutSection ]
+
+                else
+                    [ warmupSection, workoutSection ]
+               )
+        )
+
+
+workoutSectionView : Model -> String -> Int -> Workout -> Html Msg
+workoutSectionView model title max workout =
+    let
+        lifts : List Float
+        lifts =
+            applyWorkout workout max model.bar
+
+        counts : List String
+        counts =
+            map second workout.movements
+
+        platesList : List String
+        platesList =
+            platesDisplay model.bar model.plates lifts
+
+        rows : List ( Float, String, String )
+        rows =
+            map3 triple lifts counts platesList
+    in
+    div [ class "section" ]
+        (div [ class "row title" ] [ text title ]
+            :: map createWorkoutRow rows
+        )
+
+
+createWorkoutRow : ( Float, String, String ) -> Html Msg
+createWorkoutRow ( lift, count, plates ) =
     div [ class "row lift" ]
-        [ span [ class "weight" ] [ text (String.fromFloat lift ++ " lbs") ]
+        [ span [ class "weight" ] [ text (String.fromFloat lift) ]
+        , span [ class "label" ] [ text "lbs" ]
         , span [ class "count" ] [ text ("x" ++ count) ]
-        , span [ class "plates" ] [ text ("[" ++ plateDisplay ++ "]") ]
+        , span [ class "plates" ] [ text ("[ " ++ plates ++ " ]") ]
         ]
 
 
-roundToFive : Float -> Float
-roundToFive weight =
-    toFloat (5 * floor (weight / 5))
+platesDisplay : Float -> List Float -> List Float -> List String
+platesDisplay bar platesSpec lifts =
+    lifts
+        |> map (\lift -> lift - bar)
+        |> map (calcPlates platesSpec)
+        |> map
+            (\plates ->
+                plates
+                    |> map String.fromFloat
+                    |> String.join ", "
+            )
 
 
-calcPlates : Float -> List Float -> List Float
-calcPlates remaining plates =
+triple : a -> b -> c -> ( a, b, c )
+triple a b c =
+    ( a, b, c )
+
+
+calcPlates : List Float -> Float -> List Float
+calcPlates plates remaining =
     case plates of
         [] ->
             []
@@ -345,7 +399,38 @@ calcPlates remaining plates =
                 []
 
             else if (2 * largest) > remaining then
-                calcPlates remaining rest
+                calcPlates rest remaining
 
             else
-                largest :: calcPlates (remaining - (2 * largest)) plates
+                largest :: calcPlates plates (remaining - (2 * largest))
+
+
+{-| TODO: convert to editable input fields
+-}
+liftMaxRow : String -> Int -> (Int -> Msg) -> Html Msg
+liftMaxRow lift max changeLift =
+    div [ class "row" ]
+        [ button [ onClick (changeLift -5) ] [ text "-5" ]
+        , div [ class "label" ]
+            [ text lift ]
+        , div [ class "value" ]
+            [ text (String.fromInt max) ]
+        , button [ onClick (changeLift 5) ] [ text "+5" ]
+        ]
+
+
+settingsButton : Msg -> Html Msg
+settingsButton openView =
+    button [ class "settings-button", onClick openView ]
+        [ ionicon "settings" ]
+
+
+backButton : Msg -> Html Msg
+backButton openView =
+    button [ class "back-button", onClick openView ]
+        [ ionicon "arrow-round-back" ]
+
+
+ionicon : String -> Html Msg
+ionicon icon =
+    node "ion-icon" [ attribute "name" icon ] []

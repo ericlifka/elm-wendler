@@ -1,0 +1,26 @@
+@primary-lightest: #f0f9fd;
+@primary-light: #b4e2f5;
+@primary-medium: #5bc0eb;
+@primary-darkest: #224656;
+@primary-dark: #679cb3;
+@box-shadow: #cfcece;
+// 
+.button-box-shadow(@size: 8px) {
+  box-shadow: 0 0 @size 0px @box-shadow;
+  &:active {
+    box-shadow: none;
+  }
+}
+
+.title-bar() {
+  font-size: 36px;
+  margin: 0 0 20px 0;
+  padding: 5px;
+  background-color: @primary-medium;
+  color: @primary-lightest;
+  box-shadow: 0 0 15px 0 @box-shadow;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}

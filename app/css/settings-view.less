@@ -1,0 +1,45 @@
+.settings-view {
+  display: flex;
+  flex-direction: column;
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    margin: 7px;
+  }
+  .title-bar {
+    .title-bar();
+  }
+  .value {
+    font-weight: bold;
+    font-size: 28px;
+    min-width: 60px;
+    margin-right: 25px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .label {
+    min-width: 100px;
+    margin-left: 20px;
+    display: flex;
+    justify-content: flex-start;
+  }
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+    background-color: @primary-lightest;
+    color: @primary-medium;
+    border: 1px solid @primary-medium;
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    font-weight: bolder;
+    font-size: 18px;
+    padding-right: 10px;
+    .button-box-shadow(5px);
+  }
+}

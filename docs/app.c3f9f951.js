@@ -5552,100 +5552,80 @@ var author$project$Main$subscriptions = function (model) {
 	return A2(elm$core$Platform$Sub$map, author$project$Main$StorageEvent, author$project$LocalStorage$watchChanges);
 };
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Main$resetBench = function (model) {
-	return _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{bench: 65}),
-		elm$core$Platform$Cmd$none);
-};
-var author$project$Main$resetDeadlift = function (model) {
-	return _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{deadlift: 135}),
-		elm$core$Platform$Cmd$none);
-};
-var author$project$Main$resetPress = function (model) {
-	return _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{press: 45}),
-		elm$core$Platform$Cmd$none);
-};
-var author$project$Main$resetSquat = function (model) {
-	return _Utils_Tuple2(
-		_Utils_update(
-			model,
-			{squat: 85}),
-		elm$core$Platform$Cmd$none);
-};
+var author$project$Main$resetLift = F2(
+	function (model, lift) {
+		switch (lift) {
+			case 'bench':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{bench: 65}),
+					elm$core$Platform$Cmd$none);
+			case 'squat':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{squat: 85}),
+					elm$core$Platform$Cmd$none);
+			case 'deadlift':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{deadlift: 135}),
+					elm$core$Platform$Cmd$none);
+			case 'press':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{press: 45}),
+					elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		}
+	});
+var elm$core$Debug$log = _Debug_log;
 var author$project$Main$logError = function (error) {
+	var log = A2(elm$core$Debug$log, 'ERROR', error);
 	return elm$core$Platform$Cmd$none;
 };
 var elm$core$String$toInt = _String_toInt;
-var author$project$Main$updateBench = F2(
-	function (model, benchStr) {
-		var _n0 = elm$core$String$toInt(benchStr);
-		if (_n0.$ === 'Just') {
-			var bench = _n0.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{bench: bench}),
-				elm$core$Platform$Cmd$none);
-		} else {
+var author$project$Main$updateLift = F3(
+	function (model, lift, valStr) {
+		var _n0 = elm$core$String$toInt(valStr);
+		if (_n0.$ === 'Nothing') {
 			return _Utils_Tuple2(
 				model,
-				author$project$Main$logError('Got invalid int value: ' + benchStr));
-		}
-	});
-var author$project$Main$updateDeadlift = F2(
-	function (model, deadliftStr) {
-		var _n0 = elm$core$String$toInt(deadliftStr);
-		if (_n0.$ === 'Just') {
-			var deadlift = _n0.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{deadlift: deadlift}),
-				elm$core$Platform$Cmd$none);
+				author$project$Main$logError('Got invalid int value: (' + (lift + (', ' + (valStr + ')')))));
 		} else {
-			return _Utils_Tuple2(
-				model,
-				author$project$Main$logError('Got invalid int value: ' + deadliftStr));
-		}
-	});
-var author$project$Main$updatePress = F2(
-	function (model, pressStr) {
-		var _n0 = elm$core$String$toInt(pressStr);
-		if (_n0.$ === 'Just') {
-			var press = _n0.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{press: press}),
-				elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(
-				model,
-				author$project$Main$logError('Got invalid int value: ' + pressStr));
-		}
-	});
-var author$project$Main$updateSquat = F2(
-	function (model, squatStr) {
-		var _n0 = elm$core$String$toInt(squatStr);
-		if (_n0.$ === 'Just') {
-			var squat = _n0.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{squat: squat}),
-				elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(
-				model,
-				author$project$Main$logError('Got invalid int value: ' + squatStr));
+			var value = _n0.a;
+			switch (lift) {
+				case 'bench':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bench: value}),
+						elm$core$Platform$Cmd$none);
+				case 'squat':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{squat: value}),
+						elm$core$Platform$Cmd$none);
+				case 'deadlift':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{deadlift: value}),
+						elm$core$Platform$Cmd$none);
+				case 'press':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{press: value}),
+						elm$core$Platform$Cmd$none);
+				default:
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			}
 		}
 	});
 var elm$core$Maybe$map = F2(
@@ -5669,42 +5649,13 @@ var elm$core$Maybe$withDefault = F2(
 	});
 var author$project$Main$storageUpdate = F3(
 	function (model, key, value) {
-		switch (key) {
-			case 'bench':
-				return A2(
-					elm$core$Maybe$withDefault,
-					author$project$Main$resetBench(model),
-					A2(
-						elm$core$Maybe$map,
-						author$project$Main$updateBench(model),
-						value));
-			case 'squat':
-				return A2(
-					elm$core$Maybe$withDefault,
-					author$project$Main$resetSquat(model),
-					A2(
-						elm$core$Maybe$map,
-						author$project$Main$updateSquat(model),
-						value));
-			case 'deadlift':
-				return A2(
-					elm$core$Maybe$withDefault,
-					author$project$Main$resetDeadlift(model),
-					A2(
-						elm$core$Maybe$map,
-						author$project$Main$updateDeadlift(model),
-						value));
-			case 'press':
-				return A2(
-					elm$core$Maybe$withDefault,
-					author$project$Main$resetPress(model),
-					A2(
-						elm$core$Maybe$map,
-						author$project$Main$updatePress(model),
-						value));
-			default:
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		}
+		return A2(
+			elm$core$Maybe$withDefault,
+			A2(author$project$Main$resetLift, model, key),
+			A2(
+				elm$core$Maybe$map,
+				A2(author$project$Main$updateLift, model, key),
+				value));
 	});
 var elm$core$Tuple$mapSecond = F2(
 	function (func, _n0) {
@@ -6120,7 +6071,7 @@ var author$project$Main$createLiftWorkout = F4(
 				]),
 			A2(elm$core$List$cons, buttonElement, rowList));
 	});
-var author$project$Main$workouts = {
+var author$project$Workouts$workouts = {
 	five: {
 		movements: _List_fromArray(
 			[
@@ -6195,10 +6146,10 @@ var author$project$Main$liftGroup = F4(
 						[
 							elm$html$Html$text(name)
 						])),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Main$workouts.warmup, author$project$Main$WarmupWorkout),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Main$workouts.five, author$project$Main$FiveWorkout),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Main$workouts.three, author$project$Main$ThreeWorkout),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Main$workouts.one, author$project$Main$OneWorkout)
+					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.warmup, author$project$Main$WarmupWorkout),
+					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.five, author$project$Main$FiveWorkout),
+					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.three, author$project$Main$ThreeWorkout),
+					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.one, author$project$Main$OneWorkout)
 				]));
 	});
 var elm$core$Basics$negate = function (n) {
@@ -6259,12 +6210,33 @@ var author$project$Main$liftMaxRow = F3(
 						]))
 				]));
 	});
+var elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var elm$html$Html$node = elm$virtual_dom$VirtualDom$node;
+var elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var elm$html$Html$Attributes$attribute = elm$virtual_dom$VirtualDom$attribute;
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
+				A3(
+				elm$html$Html$node,
+				'ion-icon',
+				_List_fromArray(
+					[
+						A2(elm$html$Html$Attributes$attribute, 'name', 'settings')
+					]),
+				_List_Nil),
 				A2(
 				elm$html$Html$div,
 				_List_fromArray(
@@ -7813,11 +7785,6 @@ var elm$browser$Debugger$History$consMsg = F3(
 				A4(elm$html$Html$Lazy$lazy3, elm$browser$Debugger$History$viewMessage, currentIndex, index, msg),
 				rest));
 	});
-var elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
-};
-var elm$html$Html$node = elm$virtual_dom$VirtualDom$node;
 var elm$browser$Debugger$History$styles = A3(
 	elm$html$Html$node,
 	'style',
@@ -11055,7 +11022,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40123" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40311" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

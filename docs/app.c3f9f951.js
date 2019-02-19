@@ -5462,21 +5462,23 @@ var author$project$LocalStorage$request = function (key) {
 					elm$json$Json$Encode$string(key))
 				])));
 };
-var author$project$Main$None = {$: 'None'};
-var author$project$Main$WarmupWorkout = {$: 'WarmupWorkout'};
+var author$project$Main$NoMovement = {$: 'NoMovement'};
+var author$project$Main$NoWeek = {$: 'NoWeek'};
+var author$project$Main$WorkoutView = {$: 'WorkoutView'};
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
 		{
 			bar: 45,
-			bench: 65,
-			deadlift: 135,
-			openGroup: author$project$Main$None,
-			openWorkout: author$project$Main$WarmupWorkout,
+			bench: 0,
+			deadlift: 0,
+			openMovement: author$project$Main$NoMovement,
+			openView: author$project$Main$WorkoutView,
+			openWeek: author$project$Main$NoWeek,
 			plates: _List_fromArray(
 				[45, 25, 10, 5, 2.5]),
-			press: 45,
-			squat: 85
+			press: 0,
+			squat: 0
 		},
 		elm$core$Platform$Cmd$batch(
 			_List_fromArray(
@@ -5583,9 +5585,7 @@ var author$project$Main$resetLift = F2(
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
 	});
-var elm$core$Debug$log = _Debug_log;
 var author$project$Main$logError = function (error) {
-	var log = A2(elm$core$Debug$log, 'ERROR', error);
 	return elm$core$Platform$Cmd$none;
 };
 var elm$core$String$toInt = _String_toInt;
@@ -5760,27 +5760,143 @@ var author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					model,
 					A2(author$project$Main$saveLift, 'press', model.press + value));
-			case 'ToggleGroup':
-				var group = msg.a;
+			case 'SwitchView':
+				var newView = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{
-							openGroup: _Utils_eq(model.openGroup, group) ? author$project$Main$None : group
-						}),
+						{openView: newView}),
 					elm$core$Platform$Cmd$none);
-			case 'ToggleWorkout':
-				var workout = msg.a;
+			case 'SwitchWeek':
+				var week = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{openWorkout: workout}),
+						{openWeek: week}),
+					elm$core$Platform$Cmd$none);
+			case 'SwitchMovement':
+				var movement = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{openMovement: movement}),
 					elm$core$Platform$Cmd$none);
 			default:
 				var event = msg.a;
 				return A2(author$project$Main$handleStorageEvent, model, event);
 		}
 	});
+var author$project$Main$SettingsView = {$: 'SettingsView'};
+var author$project$Main$SwitchView = function (a) {
+	return {$: 'SwitchView', a: a};
+};
+var elm$json$Json$Decode$succeed = _Json_succeed;
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var elm$html$Html$node = elm$virtual_dom$VirtualDom$node;
+var elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var elm$html$Html$Attributes$attribute = elm$virtual_dom$VirtualDom$attribute;
+var author$project$Main$ionicon = function (icon) {
+	return A3(
+		elm$html$Html$node,
+		'ion-icon',
+		_List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$attribute, 'name', icon)
+			]),
+		_List_Nil);
+};
+var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var author$project$Main$backButton = function (openView) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('back-button-wrapper')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('nav-button'),
+						elm$html$Html$Events$onClick(openView)
+					]),
+				_List_fromArray(
+					[
+						author$project$Main$ionicon('arrow-round-back')
+					]))
+			]));
+};
+var author$project$Main$settingsButton = function (openView) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('settings-button-wrapper')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('nav-button'),
+						elm$html$Html$Events$onClick(openView)
+					]),
+				_List_fromArray(
+					[
+						author$project$Main$ionicon('settings')
+					]))
+			]));
+};
 var author$project$Main$AddBench = function (a) {
 	return {$: 'AddBench', a: a};
 };
@@ -5793,21 +5909,164 @@ var author$project$Main$AddPress = function (a) {
 var author$project$Main$AddSquat = function (a) {
 	return {$: 'AddSquat', a: a};
 };
-var author$project$Main$BenchGroup = {$: 'BenchGroup'};
-var author$project$Main$DeadliftGroup = {$: 'DeadliftGroup'};
-var author$project$Main$PressGroup = {$: 'PressGroup'};
-var author$project$Main$SquatGroup = {$: 'SquatGroup'};
-var author$project$Main$FiveWorkout = {$: 'FiveWorkout'};
-var author$project$Main$OneWorkout = {$: 'OneWorkout'};
-var author$project$Main$ThreeWorkout = {$: 'ThreeWorkout'};
-var author$project$Main$ToggleGroup = function (a) {
-	return {$: 'ToggleGroup', a: a};
+var elm$core$Basics$negate = function (n) {
+	return -n;
 };
-var author$project$Main$ToggleWorkout = function (a) {
-	return {$: 'ToggleWorkout', a: a};
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$Main$liftMaxRow = F3(
+	function (lift, max, changeLift) {
+		return A2(
+			elm$html$Html$div,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$class('row')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$button,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onClick(
+							changeLift(-5))
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('-5')
+						])),
+					A2(
+					elm$html$Html$div,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('label')
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(lift)
+						])),
+					A2(
+					elm$html$Html$div,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('value')
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(
+							elm$core$String$fromInt(max))
+						])),
+					A2(
+					elm$html$Html$button,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onClick(
+							changeLift(5))
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('+5')
+						]))
+				]));
+	});
+var author$project$Main$settingsView = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('settings-view')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('title-bar')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Settings')
+					])),
+				A3(author$project$Main$liftMaxRow, 'Bench', model.bench, author$project$Main$AddBench),
+				A3(author$project$Main$liftMaxRow, 'Squat', model.squat, author$project$Main$AddSquat),
+				A3(author$project$Main$liftMaxRow, 'Deadlift', model.deadlift, author$project$Main$AddDeadlift),
+				A3(author$project$Main$liftMaxRow, 'Press', model.press, author$project$Main$AddPress)
+			]));
+};
+var author$project$Main$DeloadWeek = {$: 'DeloadWeek'};
+var author$project$Main$FiveWeek = {$: 'FiveWeek'};
+var author$project$Main$OneWeek = {$: 'OneWeek'};
+var author$project$Main$SwitchWeek = function (a) {
+	return {$: 'SwitchWeek', a: a};
+};
+var author$project$Main$ThreeWeek = {$: 'ThreeWeek'};
+var author$project$Main$BenchMovement = {$: 'BenchMovement'};
+var author$project$Main$DeadliftMovement = {$: 'DeadliftMovement'};
+var author$project$Main$PressMovement = {$: 'PressMovement'};
+var author$project$Main$SquatMovement = {$: 'SquatMovement'};
+var author$project$Main$SwitchMovement = function (a) {
+	return {$: 'SwitchMovement', a: a};
+};
+var elm$core$String$fromFloat = _String_fromNumber;
+var elm$html$Html$span = _VirtualDom_node('span');
+var author$project$Main$createWorkoutRow = function (_n0) {
+	var lift = _n0.a;
+	var count = _n0.b;
+	var plates = _n0.c;
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('row lift')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$span,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('weight')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						elm$core$String$fromFloat(lift))
+					])),
+				A2(
+				elm$html$Html$span,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('label')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('lbs')
+					])),
+				A2(
+				elm$html$Html$span,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('count')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('x' + count)
+					])),
+				A2(
+				elm$html$Html$span,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('plates')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('[ ' + (plates + ' ]'))
+					]))
+			]));
 };
 var author$project$Main$calcPlates = F2(
-	function (remaining, plates) {
+	function (plates, remaining) {
 		calcPlates:
 		while (true) {
 			if (!plates.b) {
@@ -5819,24 +6078,21 @@ var author$project$Main$calcPlates = F2(
 					return _List_Nil;
 				} else {
 					if (_Utils_cmp(2 * largest, remaining) > 0) {
-						var $temp$remaining = remaining,
-							$temp$plates = rest;
-						remaining = $temp$remaining;
+						var $temp$plates = rest,
+							$temp$remaining = remaining;
 						plates = $temp$plates;
+						remaining = $temp$remaining;
 						continue calcPlates;
 					} else {
 						return A2(
 							elm$core$List$cons,
 							largest,
-							A2(author$project$Main$calcPlates, remaining - (2 * largest), plates));
+							A2(author$project$Main$calcPlates, plates, remaining - (2 * largest)));
 					}
 				}
 			}
 		}
 	});
-var author$project$Main$roundToFive = function (weight) {
-	return 5 * elm$core$Basics$floor(weight / 5);
-};
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -5906,172 +6162,87 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$core$String$fromFloat = _String_fromNumber;
-var elm$json$Json$Decode$succeed = _Json_succeed;
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
+var author$project$Main$platesDisplay = F3(
+	function (bar, platesSpec, lifts) {
+		return A2(
+			elm$core$List$map,
+			function (plates) {
+				return A2(
+					elm$core$String$join,
+					', ',
+					A2(elm$core$List$map, elm$core$String$fromFloat, plates));
+			},
+			A2(
+				elm$core$List$map,
+				author$project$Main$calcPlates(platesSpec),
+				A2(
+					elm$core$List$map,
+					function (lift) {
+						return lift - bar;
+					},
+					lifts)));
+	});
+var author$project$Main$triple = F3(
+	function (a, b, c) {
+		return _Utils_Tuple3(a, b, c);
+	});
+var author$project$Workouts$roundToFive = function (weight) {
+	return 5 * elm$core$Basics$floor(weight / 5);
 };
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$html$Html$span = _VirtualDom_node('span');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
+var author$project$Workouts$applyWorkout = F3(
+	function (workout, max, min) {
 		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$string(string));
+			elm$core$List$map,
+			author$project$Workouts$roundToFive,
+			A2(
+				elm$core$List$map,
+				elm$core$Basics$max(min),
+				A2(
+					elm$core$List$map,
+					elm$core$Basics$mul(max),
+					A2(elm$core$List$map, elm$core$Tuple$first, workout.movements))));
 	});
-var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
-var author$project$Main$createLiftTargetRow = F3(
-	function (model, liftMax, _n0) {
-		var percent = _n0.a;
-		var count = _n0.b;
-		var lift = A2(
-			elm$core$Basics$max,
-			model.bar,
-			author$project$Main$roundToFive(percent * liftMax));
-		var plates = A2(author$project$Main$calcPlates, lift - model.bar, model.plates);
-		var plateDisplay = A2(
-			elm$core$String$join,
-			', ',
-			A2(elm$core$List$map, elm$core$String$fromFloat, plates));
-		return A2(
-			elm$html$Html$div,
-			_List_fromArray(
-				[
-					elm$html$Html$Attributes$class('row lift')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$span,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('weight')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text(
-							elm$core$String$fromFloat(lift) + ' lbs')
-						])),
-					A2(
-					elm$html$Html$span,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('count')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('x' + count)
-						])),
-					A2(
-					elm$html$Html$span,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('plates')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('[' + (plateDisplay + ']'))
-						]))
-				]));
-	});
-var elm$core$Basics$neq = _Utils_notEqual;
-var elm$html$Html$button = _VirtualDom_node('button');
-var elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
+var elm$core$List$map3 = _List_map3;
 var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
 	return y;
 };
-var elm$html$Html$Attributes$classList = function (classes) {
-	return elm$html$Html$Attributes$class(
-		A2(
-			elm$core$String$join,
-			' ',
-			A2(
-				elm$core$List$map,
-				elm$core$Tuple$first,
-				A2(elm$core$List$filter, elm$core$Tuple$second, classes))));
-};
-var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		elm$html$Html$Events$on,
-		'click',
-		elm$json$Json$Decode$succeed(msg));
-};
-var author$project$Main$createLiftWorkout = F4(
-	function (model, lift, workout, sectionMsg) {
-		var rowList = A2(
-			elm$core$List$map,
-			A2(author$project$Main$createLiftTargetRow, model, lift),
-			workout.movements);
-		var buttonElement = A2(
-			elm$html$Html$button,
-			_List_fromArray(
-				[
-					elm$html$Html$Events$onClick(
-					author$project$Main$ToggleWorkout(sectionMsg)),
-					elm$html$Html$Attributes$classList(
-					_List_fromArray(
-						[
-							_Utils_Tuple2('row header', true),
-							_Utils_Tuple2(
-							'active',
-							_Utils_eq(sectionMsg, model.openWorkout))
-						]))
-				]),
-			_List_fromArray(
-				[
-					elm$html$Html$text(workout.name)
-				]));
+var author$project$Main$workoutSectionView = F4(
+	function (model, title, max, workout) {
+		var lifts = A3(author$project$Workouts$applyWorkout, workout, max, model.bar);
+		var platesList = A3(author$project$Main$platesDisplay, model.bar, model.plates, lifts);
+		var counts = A2(elm$core$List$map, elm$core$Tuple$second, workout.movements);
+		var rows = A4(elm$core$List$map3, author$project$Main$triple, lifts, counts, platesList);
 		return A2(
 			elm$html$Html$div,
 			_List_fromArray(
 				[
-					elm$html$Html$Attributes$classList(
+					elm$html$Html$Attributes$class('section')
+				]),
+			A2(
+				elm$core$List$cons,
+				A2(
+					elm$html$Html$div,
 					_List_fromArray(
 						[
-							_Utils_Tuple2('week', true),
-							_Utils_Tuple2(workout.name, true),
-							_Utils_Tuple2(
-							'hidden',
-							!_Utils_eq(sectionMsg, model.openWorkout))
-						]))
-				]),
-			A2(elm$core$List$cons, buttonElement, rowList));
+							elm$html$Html$Attributes$class('row title')
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(title)
+						])),
+				A2(elm$core$List$map, author$project$Main$createWorkoutRow, rows)));
 	});
 var author$project$Workouts$workouts = {
+	deload: {
+		movements: _List_fromArray(
+			[
+				_Utils_Tuple2(0.4, '5'),
+				_Utils_Tuple2(0.5, '5'),
+				_Utils_Tuple2(0.6, '5')
+			]),
+		name: 'Deload'
+	},
 	five: {
 		movements: _List_fromArray(
 			[
@@ -6104,166 +6275,234 @@ var author$project$Workouts$workouts = {
 			[
 				_Utils_Tuple2(0.4, '5'),
 				_Utils_Tuple2(0.5, '5'),
-				_Utils_Tuple2(0.6, '5')
+				_Utils_Tuple2(0.6, '3')
 			]),
-		name: 'Warmup/Deload'
+		name: 'Warmup'
 	}
 };
-var author$project$Main$liftGroup = F4(
-	function (name, model, lift, group) {
+var author$project$Main$workoutView = F4(
+	function (model, movement, max, workout) {
+		var workoutSection = A4(author$project$Main$workoutSectionView, model, 'Workout', max, workout);
+		var warmupSection = A4(author$project$Main$workoutSectionView, model, 'Warmup', max, author$project$Workouts$workouts.warmup);
+		var header = _List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('title-bar')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text(movement + (' ' + workout.name))
+					])),
+				author$project$Main$backButton(
+				author$project$Main$SwitchMovement(author$project$Main$NoMovement))
+			]);
 		return A2(
 			elm$html$Html$div,
 			_List_fromArray(
 				[
-					elm$html$Html$Attributes$classList(
-					_List_fromArray(
-						[
-							_Utils_Tuple2('group', true),
-							_Utils_Tuple2(name, true),
-							_Utils_Tuple2(
-							'visible',
-							_Utils_eq(model.openGroup, group))
-						]))
+					elm$html$Html$Attributes$class('workout-view')
 				]),
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$button,
+			_Utils_ap(
+				header,
+				_Utils_eq(workout, author$project$Workouts$workouts.deload) ? _List_fromArray(
+					[workoutSection]) : _List_fromArray(
+					[warmupSection, workoutSection])));
+	});
+var author$project$Main$workoutSubMenuView = F2(
+	function (model, workout) {
+		var _n0 = model.openMovement;
+		switch (_n0.$) {
+			case 'NoMovement':
+				return A2(
+					elm$html$Html$div,
 					_List_fromArray(
 						[
-							elm$html$Html$Events$onClick(
-							author$project$Main$ToggleGroup(group)),
-							elm$html$Html$Attributes$classList(
+							elm$html$Html$Attributes$class('workout-view')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							elm$html$Html$div,
 							_List_fromArray(
 								[
-									_Utils_Tuple2('group-header header', true),
-									_Utils_Tuple2(
-									'active',
-									_Utils_eq(model.openGroup, group))
+									elm$html$Html$Attributes$class('title-bar')
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text(workout.name)
+								])),
+							author$project$Main$backButton(
+							author$project$Main$SwitchWeek(author$project$Main$NoWeek)),
+							A2(
+							elm$html$Html$button,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$class('row button'),
+									elm$html$Html$Events$onClick(
+									author$project$Main$SwitchMovement(author$project$Main$BenchMovement))
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Bench')
+								])),
+							A2(
+							elm$html$Html$button,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$class('row button'),
+									elm$html$Html$Events$onClick(
+									author$project$Main$SwitchMovement(author$project$Main$SquatMovement))
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Squat')
+								])),
+							A2(
+							elm$html$Html$button,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$class('row button'),
+									elm$html$Html$Events$onClick(
+									author$project$Main$SwitchMovement(author$project$Main$DeadliftMovement))
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Deadlift')
+								])),
+							A2(
+							elm$html$Html$button,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$class('row button'),
+									elm$html$Html$Events$onClick(
+									author$project$Main$SwitchMovement(author$project$Main$PressMovement))
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Press')
 								]))
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text(name)
-						])),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.warmup, author$project$Main$WarmupWorkout),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.five, author$project$Main$FiveWorkout),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.three, author$project$Main$ThreeWorkout),
-					A4(author$project$Main$createLiftWorkout, model, lift, author$project$Workouts$workouts.one, author$project$Main$OneWorkout)
-				]));
+						]));
+			case 'BenchMovement':
+				return A4(author$project$Main$workoutView, model, 'Bench', model.bench, workout);
+			case 'SquatMovement':
+				return A4(author$project$Main$workoutView, model, 'Squat', model.squat, workout);
+			case 'DeadliftMovement':
+				return A4(author$project$Main$workoutView, model, 'Deadlift', model.deadlift, workout);
+			default:
+				return A4(author$project$Main$workoutView, model, 'Press', model.press, workout);
+		}
 	});
-var elm$core$Basics$negate = function (n) {
-	return -n;
+var author$project$Main$workoutTopMenuView = function (model) {
+	var _n0 = model.openWeek;
+	switch (_n0.$) {
+		case 'NoWeek':
+			return A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('workout-view')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('title-bar')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Wendler')
+							])),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('row button'),
+								elm$html$Html$Events$onClick(
+								author$project$Main$SwitchWeek(author$project$Main$FiveWeek))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('5-5-5')
+							])),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('row button'),
+								elm$html$Html$Events$onClick(
+								author$project$Main$SwitchWeek(author$project$Main$ThreeWeek))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('3-3-3')
+							])),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('row button'),
+								elm$html$Html$Events$onClick(
+								author$project$Main$SwitchWeek(author$project$Main$OneWeek))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('5-3-1')
+							])),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('row button'),
+								elm$html$Html$Events$onClick(
+								author$project$Main$SwitchWeek(author$project$Main$DeloadWeek))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Deload')
+							]))
+					]));
+		case 'FiveWeek':
+			return A2(author$project$Main$workoutSubMenuView, model, author$project$Workouts$workouts.five);
+		case 'ThreeWeek':
+			return A2(author$project$Main$workoutSubMenuView, model, author$project$Workouts$workouts.three);
+		case 'OneWeek':
+			return A2(author$project$Main$workoutSubMenuView, model, author$project$Workouts$workouts.one);
+		default:
+			return A2(author$project$Main$workoutSubMenuView, model, author$project$Workouts$workouts.deload);
+	}
 };
-var author$project$Main$liftMaxRow = F3(
-	function (name, lift, addLift) {
-		return A2(
-			elm$html$Html$div,
-			_List_fromArray(
-				[
-					elm$html$Html$Attributes$class('row ' + name)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$button,
-					_List_fromArray(
-						[
-							elm$html$Html$Events$onClick(
-							addLift(-5))
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('-5')
-						])),
-					A2(
-					elm$html$Html$div,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('label')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text(name)
-						])),
-					A2(
-					elm$html$Html$div,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('value')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text(
-							elm$core$String$fromInt(lift))
-						])),
-					A2(
-					elm$html$Html$button,
-					_List_fromArray(
-						[
-							elm$html$Html$Events$onClick(
-							addLift(5))
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('+5')
-						]))
-				]));
-	});
-var elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
-};
-var elm$html$Html$node = elm$virtual_dom$VirtualDom$node;
-var elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var elm$html$Html$Attributes$attribute = elm$virtual_dom$VirtualDom$attribute;
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
 		_List_fromArray(
 			[
-				A3(
-				elm$html$Html$node,
-				'ion-icon',
-				_List_fromArray(
+				elm$html$Html$Attributes$class('application')
+			]),
+		function () {
+			var _n0 = model.openView;
+			if (_n0.$ === 'SettingsView') {
+				return _List_fromArray(
 					[
-						A2(elm$html$Html$Attributes$attribute, 'name', 'settings')
-					]),
-				_List_Nil),
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
+						author$project$Main$settingsButton(
+						author$project$Main$SwitchView(author$project$Main$WorkoutView)),
+						author$project$Main$backButton(
+						author$project$Main$SwitchView(author$project$Main$WorkoutView)),
+						author$project$Main$settingsView(model)
+					]);
+			} else {
+				return _List_fromArray(
 					[
-						elm$html$Html$Attributes$class('lift-maxes')
-					]),
-				_List_fromArray(
-					[
-						A3(author$project$Main$liftMaxRow, 'Bench', model.bench, author$project$Main$AddBench),
-						A3(author$project$Main$liftMaxRow, 'Squat', model.squat, author$project$Main$AddSquat),
-						A3(author$project$Main$liftMaxRow, 'Deadlift', model.deadlift, author$project$Main$AddDeadlift),
-						A3(author$project$Main$liftMaxRow, 'Press', model.press, author$project$Main$AddPress)
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('lift-groups')
-					]),
-				_List_fromArray(
-					[
-						A4(author$project$Main$liftGroup, 'Bench', model, model.bench, author$project$Main$BenchGroup),
-						A4(author$project$Main$liftGroup, 'Squat', model, model.squat, author$project$Main$SquatGroup),
-						A4(author$project$Main$liftGroup, 'Deadlift', model, model.deadlift, author$project$Main$DeadliftGroup),
-						A4(author$project$Main$liftGroup, 'Press', model, model.press, author$project$Main$PressGroup)
-					]))
-			]));
+						author$project$Main$settingsButton(
+						author$project$Main$SwitchView(author$project$Main$SettingsView)),
+						author$project$Main$workoutTopMenuView(model)
+					]);
+			}
+		}());
 };
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
@@ -9914,6 +10153,7 @@ var elm$browser$Debugger$Report$MessageChanged = F2(
 var elm$browser$Debugger$Report$SomethingChanged = function (a) {
 	return {$: 'SomethingChanged', a: a};
 };
+var elm$core$Basics$neq = _Utils_notEqual;
 var elm$browser$Debugger$Metadata$checkTypes = F2(
 	function (old, _new) {
 		return (!_Utils_eq(old.message, _new.message)) ? A2(elm$browser$Debugger$Report$MessageChanged, old.message, _new.message) : elm$browser$Debugger$Report$SomethingChanged(
@@ -10388,7 +10628,7 @@ var elm$browser$Browser$element = _Browser_element;
 var author$project$Main$main = elm$browser$Browser$element(
 	{init: author$project$Main$init, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Json.Decode.Value":{"args":[],"type":"Json.Encode.Value"}},"unions":{"Main.Msg":{"args":[],"tags":{"AddBench":["Basics.Int"],"AddSquat":["Basics.Int"],"AddDeadlift":["Basics.Int"],"AddPress":["Basics.Int"],"ToggleGroup":["Main.OpenGroup"],"ToggleWorkout":["Main.OpenWorkout"],"StorageEvent":["LocalStorage.Event"]}},"LocalStorage.Event":{"args":[],"tags":{"Updated":["String.String","Maybe.Maybe String.String"],"WriteFailure":["String.String","Maybe.Maybe String.String","String.String"],"BadMessage":["Json.Decode.Error"]}},"Main.OpenGroup":{"args":[],"tags":{"None":[],"BenchGroup":[],"SquatGroup":[],"DeadliftGroup":[],"PressGroup":[]}},"Main.OpenWorkout":{"args":[],"tags":{"WarmupWorkout":[],"FiveWorkout":[],"ThreeWorkout":[],"OneWorkout":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Json.Decode.Error":{"args":[],"tags":{"Field":["String.String","Json.Decode.Error"],"Index":["Basics.Int","Json.Decode.Error"],"OneOf":["List.List Json.Decode.Error"],"Failure":["String.String","Json.Decode.Value"]}},"List.List":{"args":["a"],"tags":{}},"Json.Encode.Value":{"args":[],"tags":{"Value":[]}}}}})}});
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Json.Decode.Value":{"args":[],"type":"Json.Encode.Value"}},"unions":{"Main.Msg":{"args":[],"tags":{"AddBench":["Basics.Int"],"AddSquat":["Basics.Int"],"AddDeadlift":["Basics.Int"],"AddPress":["Basics.Int"],"SwitchView":["Main.OpenView"],"SwitchWeek":["Main.OpenWeek"],"SwitchMovement":["Main.OpenMovement"],"StorageEvent":["LocalStorage.Event"]}},"LocalStorage.Event":{"args":[],"tags":{"Updated":["String.String","Maybe.Maybe String.String"],"WriteFailure":["String.String","Maybe.Maybe String.String","String.String"],"BadMessage":["Json.Decode.Error"]}},"Main.OpenMovement":{"args":[],"tags":{"NoMovement":[],"BenchMovement":[],"SquatMovement":[],"DeadliftMovement":[],"PressMovement":[]}},"Main.OpenView":{"args":[],"tags":{"SettingsView":[],"WorkoutView":[]}},"Main.OpenWeek":{"args":[],"tags":{"NoWeek":[],"FiveWeek":[],"ThreeWeek":[],"OneWeek":[],"DeloadWeek":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Json.Decode.Error":{"args":[],"tags":{"Field":["String.String","Json.Decode.Error"],"Index":["Basics.Int","Json.Decode.Error"],"OneOf":["List.List Json.Decode.Error"],"Failure":["String.String","Json.Decode.Value"]}},"List.List":{"args":["a"],"tags":{}},"Json.Encode.Value":{"args":[],"tags":{"Value":[]}}}}})}});
 
 //////////////////// HMR BEGIN ////////////////////
 
@@ -11022,7 +11262,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40311" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37131" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

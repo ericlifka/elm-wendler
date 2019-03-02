@@ -1,4 +1,4 @@
-module Workouts exposing (Workout, Workouts, applyWorkout, workouts)
+module Workouts exposing (Workout, WorkoutSet, WorkoutWeek, Workouts, applyWorkout, baseWorkoutSet, baseWorkoutWeek, roundToFive, workouts)
 
 import List exposing (map)
 import Tuple exposing (first)
@@ -16,6 +16,22 @@ type alias Workouts =
     , three : Workout
     , one : Workout
     , deload : Workout
+    }
+
+
+type alias WorkoutWeek =
+    { bench : Bool
+    , squat : Bool
+    , deadlift : Bool
+    , press : Bool
+    }
+
+
+type alias WorkoutSet =
+    { five : WorkoutWeek
+    , three : WorkoutWeek
+    , one : WorkoutWeek
+    , deload : WorkoutWeek
     }
 
 
@@ -61,6 +77,24 @@ workouts =
             , ( 0.6, "5" )
             ]
         }
+    }
+
+
+baseWorkoutWeek : WorkoutWeek
+baseWorkoutWeek =
+    { bench = False
+    , squat = False
+    , deadlift = False
+    , press = False
+    }
+
+
+baseWorkoutSet : WorkoutSet
+baseWorkoutSet =
+    { five = baseWorkoutWeek
+    , three = baseWorkoutWeek
+    , one = baseWorkoutWeek
+    , deload = baseWorkoutWeek
     }
 
 

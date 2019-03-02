@@ -62,6 +62,7 @@ type alias Model =
     , openView : OpenView
     , openWeek : OpenWeek
     , openMovement : OpenMovement
+    , completedWorkouts : WorkoutSet
     }
 
 
@@ -76,6 +77,7 @@ init _ =
       , openView = WorkoutView
       , openWeek = NoWeek
       , openMovement = NoMovement
+      , completedWorkouts = baseWorkoutSet
       }
     , Cmd.batch
         [ LocalStorage.request "bench"
